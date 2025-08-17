@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeEvo.Core", "ForgeEvo.Core\ForgeEvo.Core.csproj", "{2F6D3B40-C281-4270-A951-8F1FF1598710}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeEvo.Bindings", "ForgeEvo.Bindings\ForgeEvo.Bindings.csproj", "{2B18745B-2802-4123-A06A-5D4860AE78D6}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeEvo.Demo", "ForgeEvo.Demo\ForgeEvo.Demo.csproj", "{F83B9B5B-9979-4089-B196-3CB17433FF8B}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{2F6D3B40-C281-4270-A951-8F1FF1598710}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2F6D3B40-C281-4270-A951-8F1FF1598710}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2F6D3B40-C281-4270-A951-8F1FF1598710}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2F6D3B40-C281-4270-A951-8F1FF1598710}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2B18745B-2802-4123-A06A-5D4860AE78D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2B18745B-2802-4123-A06A-5D4860AE78D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2B18745B-2802-4123-A06A-5D4860AE78D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2B18745B-2802-4123-A06A-5D4860AE78D6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F83B9B5B-9979-4089-B196-3CB17433FF8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F83B9B5B-9979-4089-B196-3CB17433FF8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F83B9B5B-9979-4089-B196-3CB17433FF8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F83B9B5B-9979-4089-B196-3CB17433FF8B}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
