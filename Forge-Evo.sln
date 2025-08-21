@@ -6,6 +6,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeEvo.Bindings", "ForgeE
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeEvo.Demo", "ForgeEvo.Demo\ForgeEvo.Demo.csproj", "{F83B9B5B-9979-4089-B196-3CB17433FF8B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeEvo.Core.Tests", "ForgeEvo.Core.Tests\ForgeEvo.Core.Tests.csproj", "{60BD6313-EB65-4C68-A137-A8650C9CDF71}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ForgeEvo.Core.Benchmarks", "ForgeEvo.Core.Benchmarks\ForgeEvo.Core.Benchmarks.csproj", "{970117CD-B72C-4916-BCE6-F9141FE1394C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -24,5 +28,13 @@ Global
 		{F83B9B5B-9979-4089-B196-3CB17433FF8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F83B9B5B-9979-4089-B196-3CB17433FF8B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F83B9B5B-9979-4089-B196-3CB17433FF8B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{60BD6313-EB65-4C68-A137-A8650C9CDF71}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{60BD6313-EB65-4C68-A137-A8650C9CDF71}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{60BD6313-EB65-4C68-A137-A8650C9CDF71}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{60BD6313-EB65-4C68-A137-A8650C9CDF71}.Release|Any CPU.Build.0 = Release|Any CPU
+		{970117CD-B72C-4916-BCE6-F9141FE1394C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{970117CD-B72C-4916-BCE6-F9141FE1394C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{970117CD-B72C-4916-BCE6-F9141FE1394C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{970117CD-B72C-4916-BCE6-F9141FE1394C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

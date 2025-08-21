@@ -7,3 +7,4 @@ riderModule.iml
 /_ReSharper.Caches/
 
 /.idea/
+/ForgeEvo.Core.Benchmarks/BenchmarkDotNet.Artifacts
