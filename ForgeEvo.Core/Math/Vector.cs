@@ -48,22 +48,22 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     public static readonly Vector2D One = new(1F, 1F);
 
     /// <summary>
-    ///     Default up vector with Y component set to 1.
+    ///     Default up vector with its Y component set to 1.
     /// </summary>
     public static readonly Vector2D Up = new(0F, 1F);
 
     /// <summary>
-    ///     Default down vector with Y component set to -1.
+    ///     Default down vector with its Y component set to -1.
     /// </summary>
     public static readonly Vector2D Down = new(0F, -1F);
 
     /// <summary>
-    ///     Default left vector with X component set to 01.
+    ///     Default left vector with its X component set to 01.
     /// </summary>
     public static readonly Vector2D Left = new(-1F, 0F);
 
     /// <summary>
-    ///     Default right vector with X component set to 1.
+    ///     Default right vector with its X component set to 1.
     /// </summary>
     public static readonly Vector2D Right = new(1F, 0F);
 
@@ -127,7 +127,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="vector">Vector to divide.</param>
     /// <param name="scalar">Scalar to divide the vector by.</param>
     /// <returns>Vector divided by the scalar.</returns>
-    /// <exception cref="DivideByZeroException">A vector cannot be divided by a zero scalar.</exception>
+    /// <exception cref="DivideByZeroException">Vectors cannot be divided by a zero scalar.</exception>
     public static Vector2D operator /(Vector2D vector, float scalar) => scalar == 0F
         ? throw new DivideByZeroException("Cannot divide a vector by zero.")
         : new(vector._vector / scalar);
@@ -141,7 +141,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     public static float operator *(Vector2D a, Vector2D b) => Vector2.Dot(a._vector, b._vector);
 
     /// <summary>
-    ///     Compute the cross product of two vectors.
+    ///     Compute the cross-product of two vectors.
     /// </summary>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
@@ -184,7 +184,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     public float Length() => _vector.Length();
 
     /// <summary>
-    ///     Compute the square of the length of the vector. Useful in hot-loops due to lack of a square-root operation.
+    ///     Compute the squared length of the vector. Useful in hot-loops due to lack of a square-root operation.
     /// </summary>
     /// <returns>Square of the length, or magnitude of the vector.</returns>
     public float LengthSquared() => _vector.LengthSquared();
@@ -193,7 +193,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     ///     Compute the normal of the vector, i.e., set its length to 1 while preserving its direction.
     /// </summary>
     /// <returns>Normal of the vector.</returns>
-    /// <exception cref="DivideByZeroException">A vector of zero length cannot be normalized.</exception>
+    /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be normalized.</exception>
     public Vector2D Normal()
     {
         float length = Length();
@@ -212,11 +212,11 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     ///     Scale a vector to a given length while preserving its direction.
     /// </summary>
     /// <param name="scale">New length of the vector.</param>
-    /// <returns>Scaled vector with the given length and same direction.</returns>
+    /// <returns>Scaled vector with the given length and the same direction.</returns>
     public Vector2D ScaleTo(float scale) => Normal() * scale;
 
     /// <summary>
-    ///     Reflect the vector along a given normal to its direction.
+    ///     Reflect the vector along the given normal to its direction.
     /// </summary>
     /// <param name="normal">Normal of the reflection.</param>
     /// <returns>Reflected vector with respect to the normal.</returns>
@@ -423,7 +423,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="vector">Vector to divide.</param>
     /// <param name="scalar">Scalar to divide the vector by.</param>
     /// <returns>Vector divided by the scalar.</returns>
-    /// <exception cref="DivideByZeroException">A vector cannot be divided by a zero scalar.</exception>
+    /// <exception cref="DivideByZeroException">Vectors cannot be divided by a zero scalar.</exception>
     public static MutableVector2D operator /(MutableVector2D vector, float scalar) => scalar == 0F
         ? throw new DivideByZeroException("Cannot divide a vector by zero.")
         : new(vector._vector / scalar);
@@ -437,7 +437,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     public static float operator *(MutableVector2D a, MutableVector2D b) => Vector2.Dot(a._vector, b._vector);
 
     /// <summary>
-    ///     Compute the cross product of two vectors.
+    ///     Compute the cross-product of two vectors.
     /// </summary>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
@@ -481,7 +481,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     public float Length() => _vector.Length();
 
     /// <summary>
-    ///     Compute the square of the length of the vector. Useful in hot-loops due to lack of a square-root operation.
+    ///     Compute the squared length of the vector. Useful in hot-loops due to lack of a square-root operation.
     /// </summary>
     /// <returns>Square of the length, or magnitude of the vector.</returns>
     public float LengthSquared() => _vector.LengthSquared();
@@ -490,7 +490,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     ///     Compute the normal of the vector, i.e., set its length to 1 while preserving its direction.
     /// </summary>
     /// <returns>Normal of the vector.</returns>
-    /// <exception cref="DivideByZeroException">A vector of zero length cannot be normalized.</exception>
+    /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be normalized.</exception>
     public Vector2D Normal()
     {
         float length = Length();
@@ -502,7 +502,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <summary>
     ///     Normalize the vector itself, i.e., set its length to 1 while preserving its direction.
     /// </summary>
-    /// <exception cref="DivideByZeroException">A vector of zero length cannot be normalized.</exception>
+    /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be normalized.</exception>
     public void Normalize()
     {
         float length = Length();
@@ -540,11 +540,11 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     ///     Scale a vector to a given length while preserving its direction.
     /// </summary>
     /// <param name="scale">New length of the vector.</param>
-    /// <returns>Scaled vector with the given length and same direction.</returns>
+    /// <returns>Scaled vector with the given length and the same direction.</returns>
     public Vector2D ScaleTo(float scale) => Normal() * scale;
 
     /// <summary>
-    ///     Reflect the vector itself along a given normal to its direction.
+    ///     Reflect the vector itself along the given normal to its direction.
     /// </summary>
     /// <param name="normal">Normal of the reflection.</param>
     /// <exception cref="DivideByZeroException">The normal must be normalized.</exception>
@@ -557,7 +557,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     }
 
     /// <summary>
-    ///     Reflect the vector along a given normal to its direction.
+    ///     Reflect the vector along the given normal to its direction.
     /// </summary>
     /// <param name="normal">Normal of the reflection.</param>
     /// <returns>Reflected vector with respect to the normal.</returns>
