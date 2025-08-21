@@ -1,7 +1,7 @@
 ﻿using ForgeEvo.Core.Math;
 using Veldrid;
 
-namespace ForgeEvo.Core;
+namespace ForgeEvo.Core.Engine;
 
 /// <summary>
 ///     Input handler for a game with keyboard and mouse controls.
