@@ -1,4 +1,5 @@
 ﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace ForgeEvo.Core.Math;
 
@@ -17,12 +18,14 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <param name="x">X coordinate of the vector.</param>
     /// <param name="y">Y coordinate of the vector.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D(float x, float y) => _vector = new(x, y);
 
     /// <summary>
     ///     Create a new vector using <c>Vector2</c> directly.
     /// </summary>
     /// <param name="vector"><c>Vector2</c> to convert into a Forge <c>Vector2D</c>.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D(Vector2 vector) => _vector = vector;
 
     /// <summary>
@@ -76,6 +79,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <param name="vector">Forge vector to convert.</param>
     /// <returns>Standard <c>Vector2</c> with the same components.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector2(Vector2D vector) => vector._vector;
 
     /// <summary>
@@ -83,6 +87,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <param name="vector">Standard vector to convert.</param>
     /// <returns>Forge <c>Vector2D</c> with the same components.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector2D(Vector2 vector) => new(vector);
 
     #endregion
@@ -95,6 +100,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Summed vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2D operator +(Vector2D a, Vector2D b) => new(a._vector + b._vector);
 
     /// <summary>
@@ -103,6 +109,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Difference vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2D operator -(Vector2D a, Vector2D b) => new(a._vector - b._vector);
 
     /// <summary>
@@ -111,6 +118,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="vector">Vector to multiply.</param>
     /// <param name="scalar">Scalar to multiply the vector by.</param>
     /// <returns>Vector multiplied by the scalar.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2D operator *(Vector2D vector, float scalar) => new(vector._vector * scalar);
 
     /// <summary>
@@ -119,6 +127,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="scalar">Scalar to multiply the vector by.</param>
     /// <param name="vector">Vector to multiply.</param>
     /// <returns>Vector multiplied by the scalar.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2D operator *(float scalar, Vector2D vector) => new(vector._vector * scalar);
 
     /// <summary>
@@ -128,6 +137,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="scalar">Scalar to divide the vector by.</param>
     /// <returns>Vector divided by the scalar.</returns>
     /// <exception cref="DivideByZeroException">Vectors cannot be divided by a zero scalar.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2D operator /(Vector2D vector, float scalar) => scalar == 0F
         ? throw new DivideByZeroException("Cannot divide a vector by zero.")
         : new(vector._vector / scalar);
@@ -138,6 +148,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Dot product of the two vectors.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float operator *(Vector2D a, Vector2D b) => Vector2.Dot(a._vector, b._vector);
 
     /// <summary>
@@ -146,6 +157,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Cross product of the two vectors.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float operator ^(Vector2D a, Vector2D b) => a._vector.X * b._vector.Y - a._vector.Y * b._vector.X;
 
     /// <summary>
@@ -153,6 +165,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <param name="vector">Vector to negate.</param>
     /// <returns>Negation of the vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2D operator -(Vector2D vector) => new(-vector._vector);
 
     // ReSharper disable CompareOfFloatsByEqualityOperator
@@ -162,6 +175,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Whether the two vectors are equal.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(Vector2D a, Vector2D b) => a.X == b.X && a.Y == b.Y;
     // ReSharper restore CompareOfFloatsByEqualityOperator
 
@@ -171,6 +185,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Whether the two vectors are not equal.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(Vector2D a, Vector2D b) => !(a == b);
 
     #endregion
@@ -181,12 +196,14 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     ///     Compute the length of the vector.
     /// </summary>
     /// <returns>Length, or magnitude of the vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Length() => _vector.Length();
 
     /// <summary>
     ///     Compute the squared length of the vector. Useful in hot-loops due to lack of a square-root operation.
     /// </summary>
     /// <returns>Square of the length, or magnitude of the vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float LengthSquared() => _vector.LengthSquared();
 
     /// <summary>
@@ -194,6 +211,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <returns>Normal of the vector.</returns>
     /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be normalized.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D Normal()
     {
         float length = Length();
@@ -206,6 +224,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     ///     Compute the orthogonal to the given vector.
     /// </summary>
     /// <returns>Orthogonal vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D Orthogonal() => new(_vector.Y, -_vector.X);
 
     /// <summary>
@@ -213,6 +232,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <param name="scale">New length of the vector.</param>
     /// <returns>Scaled vector with the given length and the same direction.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D ScaleTo(float scale) => Normal() * scale;
 
     /// <summary>
@@ -221,6 +241,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="normal">Normal of the reflection.</param>
     /// <returns>Reflected vector with respect to the normal.</returns>
     /// <exception cref="ArgumentException">The normal must be normalized.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D ReflectTo(Vector2D normal)
     {
         if (!normal.IsNormalized())
@@ -234,6 +255,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <param name="to">Vector to which the angle is to be measured.</param>
     /// <returns>Unsigned angle between the two vectors in radians.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Angle(Vector2D to)
     {
         if (this == to)
@@ -246,6 +268,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <param name="tolerance">Tolerance for the floating-point comparison for normality.</param>
     /// <returns>Whether the vector is normalized.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsNormalized(float tolerance = 0.0001F) => System.Math.Abs(Length() - 1F) < tolerance;
 
     /// <summary>
@@ -256,6 +279,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="type">Type of distance to be calculated.</param>
     /// <returns>Distance between the two vectors.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Distance type must be valid.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Distance(Vector2D a, Vector2D b, Distance type = Math.Distance.Euclidean)
     {
         return type switch
@@ -275,6 +299,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="type">Type of distance to be calculated.</param>
     /// <returns>Square of the distance between the two vectors.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Distance type must be valid.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float DistanceSquared(Vector2D a, Vector2D b, Distance type = Math.Distance.Euclidean)
     {
         return type switch
@@ -294,6 +319,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="end">End vector.</param>
     /// <param name="weight">Weight for the interpolation function.</param>
     /// <returns>Linearly interpolated vector between the start and end.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2D LinearInterpolation(Vector2D start, Vector2D end, float weight) =>
         new(Vector2.Lerp(start._vector, end._vector, weight));
 
@@ -301,6 +327,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
 
     #region Equality / Overrides
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(Vector2D other) => _vector.X.Equals(other._vector.X) && _vector.Y.Equals(other._vector.Y);
 
     public override bool Equals(object? obj) => obj is Vector2D other && Equals(other);
@@ -325,12 +352,14 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="x">X coordinate of the vector.</param>
     /// <param name="y">Y coordinate of the vector.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public MutableVector2D(float x, float y) => _vector = new(x, y);
 
     /// <summary>
     ///     Create a new vector using <c>Vector2</c> directly.
     /// </summary>
     /// <param name="vector"><c>Vector2</c> to convert into a Forge <c>MutableVector2D</c>.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public MutableVector2D(Vector2 vector) => _vector = vector;
 
     /// <summary>
@@ -338,7 +367,9 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     public float X
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => _vector.X;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         set => _vector.X = value;
     }
 
@@ -347,7 +378,9 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     public float Y
     {
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         get => _vector.Y;
+        [MethodImpl(MethodImplOptions.AggressiveInlining)]
         set => _vector.Y = value;
     }
 
@@ -358,6 +391,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="vector">Forge vector to convert.</param>
     /// <returns>Standard <c>Vector2</c> with the same components.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector2(MutableVector2D vector) => vector._vector;
 
     /// <summary>
@@ -365,6 +399,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="vector">Standard vector to convert.</param>
     /// <returns>Forge <c>MutableVector2D</c> with the same components.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator MutableVector2D(Vector2 vector) => new(vector);
 
     /// <summary>
@@ -372,6 +407,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="vector">Mutable vector to convert.</param>
     /// <returns>Immutable vector with the same components.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector2D(MutableVector2D vector) => new(vector._vector);
 
     /// <summary>
@@ -379,6 +415,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="vector">Immutable vector to convert.</param>
     /// <returns>Mutable vector with the same components.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator MutableVector2D(Vector2D vector) => new(vector.X, vector.Y);
 
     #endregion
@@ -391,6 +428,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Summed vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MutableVector2D operator +(MutableVector2D a, MutableVector2D b) => new(a._vector + b._vector);
 
     /// <summary>
@@ -399,6 +437,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Difference vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MutableVector2D operator -(MutableVector2D a, MutableVector2D b) => new(a._vector - b._vector);
 
     /// <summary>
@@ -407,6 +446,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="vector">Vector to multiply.</param>
     /// <param name="scalar">Scalar to multiply the vector by.</param>
     /// <returns>Vector multiplied by the scalar.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MutableVector2D operator *(MutableVector2D vector, float scalar) => new(vector._vector * scalar);
 
     /// <summary>
@@ -415,6 +455,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="scalar">Scalar to multiply the vector by.</param>
     /// <param name="vector">Vector to multiply.</param>
     /// <returns>Vector multiplied by the scalar.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MutableVector2D operator *(float scalar, MutableVector2D vector) => new(vector._vector * scalar);
 
     /// <summary>
@@ -424,6 +465,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="scalar">Scalar to divide the vector by.</param>
     /// <returns>Vector divided by the scalar.</returns>
     /// <exception cref="DivideByZeroException">Vectors cannot be divided by a zero scalar.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MutableVector2D operator /(MutableVector2D vector, float scalar) => scalar == 0F
         ? throw new DivideByZeroException("Cannot divide a vector by zero.")
         : new(vector._vector / scalar);
@@ -434,6 +476,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Dot product of the two vectors.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float operator *(MutableVector2D a, MutableVector2D b) => Vector2.Dot(a._vector, b._vector);
 
     /// <summary>
@@ -442,6 +485,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Cross product of the two vectors.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float operator ^(MutableVector2D a, MutableVector2D b) =>
         a._vector.X * b._vector.Y - a._vector.Y * b._vector.X;
 
@@ -450,6 +494,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="vector">Vector to negate.</param>
     /// <returns>Negation of the vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MutableVector2D operator -(MutableVector2D vector) => new(-vector._vector);
 
     // ReSharper disable CompareOfFloatsByEqualityOperator
@@ -459,6 +504,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Whether the two vectors are equal.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator ==(MutableVector2D a, MutableVector2D b) => a.X == b.X && a.Y == b.Y;
     // ReSharper restore CompareOfFloatsByEqualityOperator
 
@@ -468,6 +514,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="a">First vector.</param>
     /// <param name="b">Second vector.</param>
     /// <returns>Whether the two vectors are not equal.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static bool operator !=(MutableVector2D a, MutableVector2D b) => !(a == b);
 
     #endregion
@@ -478,12 +525,14 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     ///     Compute the length of the vector.
     /// </summary>
     /// <returns>Length, or magnitude of the vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Length() => _vector.Length();
 
     /// <summary>
     ///     Compute the squared length of the vector. Useful in hot-loops due to lack of a square-root operation.
     /// </summary>
     /// <returns>Square of the length, or magnitude of the vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float LengthSquared() => _vector.LengthSquared();
 
     /// <summary>
@@ -491,6 +540,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <returns>Normal of the vector.</returns>
     /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be normalized.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D Normal()
     {
         float length = Length();
@@ -503,6 +553,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     ///     Normalize the vector itself, i.e., set its length to 1 while preserving its direction.
     /// </summary>
     /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be normalized.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Normalize()
     {
         float length = Length();
@@ -516,11 +567,13 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     ///     Compute the orthogonal to the given vector.
     /// </summary>
     /// <returns>Orthogonal vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D Orthogonal() => new(_vector.Y, -_vector.X);
 
     /// <summary>
     ///     Orthogonalize the vector itself.
     /// </summary>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Orthogonalize()
     {
         _vector = new(_vector.Y, -_vector.X);
@@ -530,6 +583,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     ///     Scale the vector itself to a given length while preserving its direction.
     /// </summary>
     /// <param name="scale">New length of the vector itself.</param>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Scale(float scale)
     {
         Normalize();
@@ -541,6 +595,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="scale">New length of the vector.</param>
     /// <returns>Scaled vector with the given length and the same direction.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D ScaleTo(float scale) => Normal() * scale;
 
     /// <summary>
@@ -548,6 +603,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="normal">Normal of the reflection.</param>
     /// <exception cref="DivideByZeroException">The normal must be normalized.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Reflect(MutableVector2D normal)
     {
         if (!normal.IsNormalized())
@@ -562,6 +618,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="normal">Normal of the reflection.</param>
     /// <returns>Reflected vector with respect to the normal.</returns>
     /// <exception cref="ArgumentException">The normal must be normalized.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D ReflectTo(MutableVector2D normal) => !normal.IsNormalized()
         ? throw new DivideByZeroException("Cannot reflect a vector along a normal of invalid length.")
         : new(normal._vector * -2F * (_vector * normal._vector) + _vector);
@@ -571,6 +628,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="to">Vector to which the angle is to be measured.</param>
     /// <returns>Unsigned angle between the two vectors in radians.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Angle(MutableVector2D to)
     {
         if (this == to)
@@ -584,6 +642,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="tolerance">Tolerance for the floating-point comparison for normality.</param>
     /// <returns>Whether the vector is normalized.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsNormalized(float tolerance = 0.0001F) => System.Math.Abs(Length() - 1F) < tolerance;
 
     /// <summary>
@@ -594,6 +653,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="type">Type of distance to be calculated.</param>
     /// <returns>Distance between the two vectors.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Distance type must be valid.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float Distance(MutableVector2D a, MutableVector2D b, Distance type = Math.Distance.Euclidean)
     {
         return type switch
@@ -613,6 +673,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="type">Type of distance to be calculated.</param>
     /// <returns>Square of the distance between the two vectors.</returns>
     /// <exception cref="ArgumentOutOfRangeException">Distance type must be valid.</exception>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float DistanceSquared(MutableVector2D a, MutableVector2D b, Distance type = Math.Distance.Euclidean)
     {
         return type switch
@@ -632,6 +693,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="end">End vector.</param>
     /// <param name="weight">Weight for the interpolation function.</param>
     /// <returns>Linearly interpolated vector between the start and end.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2D LinearInterpolation(MutableVector2D start, MutableVector2D end, float weight) =>
         new(Vector2.Lerp(start._vector, end._vector, weight));
 
@@ -639,6 +701,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
 
     #region Equality / Overrides
 
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool Equals(MutableVector2D other) => _vector.X.Equals(other._vector.X) && _vector.Y.Equals(other._vector.Y);
 
     public override bool Equals(object? obj) => obj is MutableVector2D other && Equals(other);
