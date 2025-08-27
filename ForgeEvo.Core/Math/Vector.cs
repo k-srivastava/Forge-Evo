@@ -214,8 +214,8 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D Normal()
     {
-        float length = Length();
-        return length == 0
+        float length = _vector.Length();
+        return length == 0F
             ? throw new DivideByZeroException("Cannot normalize a vector of zero length.")
             : new(_vector / length);
     }
@@ -232,8 +232,15 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <param name="scale">New length of the vector.</param>
     /// <returns>Scaled vector with the given length and the same direction.</returns>
+    /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be scaled.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2D ScaleTo(float scale) => Normal() * scale;
+    public Vector2D ScaleTo(float scale)
+    {
+        float length = _vector.Length();
+        return length == 0F
+            ? throw new DivideByZeroException("Cannot scale a vector of zero length.")
+            : new(_vector * scale / length);
+    }
 
     /// <summary>
     ///     Reflect the vector along the given normal to its direction.
@@ -247,7 +254,8 @@ public readonly struct Vector2D : IEquatable<Vector2D>
         if (!normal.IsNormalized())
             throw new ArgumentException("Cannot reflect a vector along a normal of invalid length.");
 
-        return normal * -2F * (this * normal) + this;
+        float dot = Vector2.Dot(_vector, normal._vector);
+        return new(_vector - 2f * dot * normal._vector);
     }
 
     /// <summary>
@@ -258,9 +266,13 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Angle(Vector2D to)
     {
-        if (this == to)
-            return 0;
-        return MathF.Acos(this * to) / (Length() * to.Length());
+        float denominator = _vector.Length() * to._vector.Length();
+        if (denominator == 0F)
+            return 0F;
+
+        float cosine = Vector2.Dot(_vector, to._vector) / denominator;
+        float clampedCosine = MathF.Min(1F, MathF.Max(-1F, cosine));
+        return MathF.Acos(clampedCosine);
     }
 
     /// <summary>
@@ -269,7 +281,13 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="tolerance">Tolerance for the floating-point comparison for normality.</param>
     /// <returns>Whether the vector is normalized.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsNormalized(float tolerance = 0.0001F) => System.Math.Abs(Length() - 1F) < tolerance;
+    public bool IsNormalized(float tolerance = 0.0001F)
+    {
+        float lengthSquared = _vector.LengthSquared();
+        float bound = 2F * tolerance + tolerance * tolerance;
+
+        return MathF.Abs(lengthSquared - 1F) < bound;
+    }
 
     /// <summary>
     ///     Calculate the distance between two vectors using a distance-type.
@@ -284,7 +302,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     {
         return type switch
         {
-            Math.Distance.Euclidean => (a - b).Length(),
+            Math.Distance.Euclidean => Vector2.Distance(a._vector, b._vector),
             Math.Distance.Manhattan => MathF.Abs(a._vector.X - b._vector.X) + MathF.Abs(a._vector.Y - b._vector.Y),
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
@@ -304,7 +322,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     {
         return type switch
         {
-            Math.Distance.Euclidean => (a - b).LengthSquared(),
+            Math.Distance.Euclidean => Vector2.DistanceSquared(a._vector, b._vector),
             Math.Distance.Manhattan => MathF.Pow(
                 MathF.Abs(a._vector.X - b._vector.X) + MathF.Abs(a._vector.Y - b._vector.Y), 2F
             ),
@@ -332,7 +350,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
 
     public override bool Equals(object? obj) => obj is Vector2D other && Equals(other);
 
-    public override int GetHashCode() => HashCode.Combine(_vector.X, _vector.Y);
+    public override int GetHashCode() => _vector.GetHashCode();
 
     #endregion
 }
@@ -543,8 +561,8 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D Normal()
     {
-        float length = Length();
-        return length == 0
+        float length = _vector.Length();
+        return length == 0F
             ? throw new DivideByZeroException("Cannot normalize a vector of zero length.")
             : new(_vector / length);
     }
@@ -556,8 +574,8 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Normalize()
     {
-        float length = Length();
-        if (length == 0)
+        float length = _vector.Length();
+        if (length == 0F)
             throw new DivideByZeroException("Cannot normalize a vector of zero length.");
 
         _vector /= length;
@@ -583,11 +601,15 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     ///     Scale the vector itself to a given length while preserving its direction.
     /// </summary>
     /// <param name="scale">New length of the vector itself.</param>
+    /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be scaled.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public void Scale(float scale)
     {
-        Normalize();
-        _vector *= scale;
+        float length = _vector.Length();
+        if (length == 0F)
+            throw new DivideByZeroException("Cannot scale a vector of zero length.");
+
+        _vector *= scale / length;
     }
 
     /// <summary>
@@ -595,8 +617,15 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <param name="scale">New length of the vector.</param>
     /// <returns>Scaled vector with the given length and the same direction.</returns>
+    /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be scaled.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2D ScaleTo(float scale) => Normal() * scale;
+    public Vector2D ScaleTo(float scale)
+    {
+        float length = _vector.Length();
+        return length == 0F
+            ? throw new DivideByZeroException("Cannot scale a vector of zero length.")
+            : new(_vector * (scale / length));
+    }
 
     /// <summary>
     ///     Reflect the vector itself along the given normal to its direction.
@@ -609,7 +638,8 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
         if (!normal.IsNormalized())
             throw new DivideByZeroException("Cannot reflect a vector along a normal of invalid length.");
 
-        _vector = normal._vector * -2F * (_vector * normal._vector) + _vector;
+        float dot = Vector2.Dot(_vector, normal._vector);
+        _vector -= 2f * dot * normal._vector;
     }
 
     /// <summary>
@@ -621,7 +651,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D ReflectTo(MutableVector2D normal) => !normal.IsNormalized()
         ? throw new DivideByZeroException("Cannot reflect a vector along a normal of invalid length.")
-        : new(normal._vector * -2F * (_vector * normal._vector) + _vector);
+        : new(_vector - 2f * Vector2.Dot(_vector, normal._vector) * normal._vector);
 
     /// <summary>
     ///     Calculate the unsigned angle between one vector and another.
@@ -631,10 +661,13 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Angle(MutableVector2D to)
     {
-        if (this == to)
-            return 0;
+        float denominator = _vector.Length() * to._vector.Length();
+        if (denominator == 0F)
+            return 0F;
 
-        return MathF.Acos(this * to) / (Length() * to.Length());
+        float cosine = Vector2.Dot(_vector, to._vector) / denominator;
+        float clampedCosine = MathF.Min(1F, MathF.Max(-1F, cosine));
+        return MathF.Acos(clampedCosine);
     }
 
     /// <summary>
@@ -643,7 +676,13 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="tolerance">Tolerance for the floating-point comparison for normality.</param>
     /// <returns>Whether the vector is normalized.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool IsNormalized(float tolerance = 0.0001F) => System.Math.Abs(Length() - 1F) < tolerance;
+    public bool IsNormalized(float tolerance = 0.0001F)
+    {
+        float lengthSquared = _vector.LengthSquared();
+        float bound = 2F * tolerance + tolerance * tolerance;
+
+        return MathF.Abs(lengthSquared - 1F) < bound;
+    }
 
     /// <summary>
     ///     Calculate the distance between two vectors using a distance-type.
@@ -658,7 +697,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     {
         return type switch
         {
-            Math.Distance.Euclidean => (a - b).Length(),
+            Math.Distance.Euclidean => Vector2.Distance(a._vector, b._vector),
             Math.Distance.Manhattan => MathF.Abs(a._vector.X - b._vector.X) + MathF.Abs(a._vector.Y - b._vector.Y),
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
@@ -678,7 +717,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     {
         return type switch
         {
-            Math.Distance.Euclidean => (a - b).LengthSquared(),
+            Math.Distance.Euclidean => Vector2.DistanceSquared(a._vector, b._vector),
             Math.Distance.Manhattan => MathF.Pow(
                 MathF.Abs(a._vector.X - b._vector.X) + MathF.Abs(a._vector.Y - b._vector.Y), 2F
             ),
