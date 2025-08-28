@@ -1,6 +1,5 @@
 ﻿using ForgeEvo.Core.Engine;
 using ForgeEvo.Core.Math;
-using Veldrid;
 
 var game = new DemoGame();
 game.Run();
