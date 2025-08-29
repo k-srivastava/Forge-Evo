@@ -48,11 +48,11 @@ public class Display
     ///     Clears the display to the specified background color.
     /// </summary>
     /// <param name="color">The color used to clear the display.</param>
-    public void Clear(RgbaFloat color)
+    public void Clear(Color color)
     {
         _commandList.Begin();
         _commandList.SetFramebuffer(_device.MainSwapchain.Framebuffer);
-        _commandList.ClearColorTarget(0, color);
+        _commandList.ClearColorTarget(0, color.ToRgbaFloat());
         _commandList.End();
 
         _device.SubmitCommands(_commandList);

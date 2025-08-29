@@ -12,5 +12,6 @@
 	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=5d4e7e54_002D67c0_002D400a_002Da9da_002Dbfa6ed0749ee/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="Vector2DTest" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::60BD6313-EB65-4C68-A137-A8650C9CDF71::net9.0::ForgeEvo.Core.Tests.Math.Vector2DTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::60BD6313-EB65-4C68-A137-A8650C9CDF71::net9.0::ForgeEvo.Core.Tests.Engine.ColorTest&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>

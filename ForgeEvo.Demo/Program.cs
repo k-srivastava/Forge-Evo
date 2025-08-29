@@ -6,6 +6,8 @@ game.Run();
 
 internal class DemoGame() : Game(title: "Forge Evo Demo")
 {
+    private readonly Color _clearColor = new(100, 149, 237);
+
     protected override void Update()
     {
         if (InputHandler.IsKeyPressed(Key.Escape))
@@ -27,6 +29,6 @@ internal class DemoGame() : Game(title: "Forge Evo Demo")
 
     protected override void Render()
     {
-        Display.Clear(RgbaFloat.CornflowerBlue);
+        Display.Clear(_clearColor);
     }
 }
