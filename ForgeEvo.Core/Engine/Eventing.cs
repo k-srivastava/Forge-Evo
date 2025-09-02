@@ -15,10 +15,10 @@ public sealed class Event
     private readonly Lock _gate = new();
 
     /// <summary>
-    ///     Maintains a thread-safe list of actions that are subscribed to an event. Actions within this list are executed when
+    ///     Maintains a thread-safe array of actions that are subscribed to an event. Actions within this array are executed when
     ///     the event is posted.
     /// </summary>
-    private readonly List<Action> _subscribers = [];
+    private volatile Action[] _subscribers = [];
 
     /// <summary>
     ///     Unique ID of the event.
@@ -73,8 +73,15 @@ public sealed class Event
     {
         lock (_gate)
         {
-            if (!_subscribers.Contains(subscriber))
-                _subscribers.Add(subscriber);
+            Action[] current = _subscribers;
+            if (Array.IndexOf(current, subscriber) >= 0)
+                return;
+
+            var updated = new Action[current.Length + 1];
+            Array.Copy(current, updated, current.Length);
+            updated[current.Length] = subscriber;
+
+            _subscribers = updated;
         }
     }
 
@@ -84,7 +91,21 @@ public sealed class Event
     /// <param name="subscriber">The subscriber to remove from the event.</param>
     public void Unsubscribe(Action subscriber)
     {
-        lock (_gate) _subscribers.Remove(subscriber);
+        lock (_gate)
+        {
+            Action[] current = _subscribers;
+            int index = Array.IndexOf(current, subscriber);
+
+            if (index < 0)
+                return;
+
+            var updated = new Action[current.Length - 1];
+
+            Array.Copy(current, updated, index);
+            Array.Copy(current, index + 1, updated, index, current.Length - index - 1);
+
+            _subscribers = updated;
+        }
     }
 
     /// <summary>
@@ -94,8 +115,10 @@ public sealed class Event
     /// </summary>
     public void Post()
     {
-        Action[] snapshot;
-        lock (_gate) snapshot = _subscribers.ToArray();
+        // ReSharper disable InconsistentlySynchronizedField
+        // This is a volatile read and is intentionally lock-free.
+        Action[] snapshot = _subscribers;
+        // ReSharper restore InconsistentlySynchronizedField
 
         foreach (Action subscriber in snapshot)
         {
@@ -121,7 +144,7 @@ public sealed class Event
     /// <returns>The total count of subscribers currently subscribed to the event.</returns>
     private int Count()
     {
-        lock (_gate) return _subscribers.Count;
+        lock (_gate) return _subscribers.Length;
     }
 }
 
