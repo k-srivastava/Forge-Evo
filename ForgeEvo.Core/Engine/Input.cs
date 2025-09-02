@@ -89,6 +89,7 @@ public static class InputHandler
         _mouseLastPosition = _mousePosition;
 
         foreach (KeyEvent keyEvent in snapshot.KeyEvents)
+        {
             if (keyEvent.Down)
             {
                 if (KeysDown.Add((Key)keyEvent.Key))
@@ -100,8 +101,10 @@ public static class InputHandler
                 if (KeysDown.Remove((Key)keyEvent.Key))
                     KeysReleased.Add((Key)keyEvent.Key);
             }
+        }
 
         foreach (MouseEvent mouseEvent in snapshot.MouseEvents)
+        {
             if (mouseEvent.Down)
             {
                 if (MouseDown.Add((MouseButton)mouseEvent.MouseButton))
@@ -113,6 +116,7 @@ public static class InputHandler
                 if (MouseDown.Remove((MouseButton)mouseEvent.MouseButton))
                     MouseReleased.Add((MouseButton)mouseEvent.MouseButton);
             }
+        }
 
         if (snapshot.WheelDelta != 0F)
             ScrollDelta = snapshot.WheelDelta;

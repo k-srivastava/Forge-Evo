@@ -80,7 +80,6 @@ public class Vector2DMicroBenchmarks
 [SimpleJob(RuntimeMoniker.Net90)]
 public class Vector2DBatchBenchmarks
 {
-    [Params(1_024, 16_384, 1_000_000)] public int Length;
     private Vector2D[] _forgeA = null!;
     private Vector2D[] _forgeB = null!;
 
@@ -88,6 +87,8 @@ public class Vector2DBatchBenchmarks
 
     private Vector2[] _systemA = null!;
     private Vector2[] _systemB = null!;
+
+    [Params(1_024, 16_384, 1_000_000)] public int Length;
 
     [GlobalSetup]
     public void Setup()
@@ -279,15 +280,15 @@ public class Vector2DBatchBenchmarks
 [SimpleJob(RuntimeMoniker.Net90)]
 public class Vector2DMathBenchmarks
 {
-    [Params(4_096, 65_536)] public int Length;
-
-    private Vector2D[] _systemA = null!;
-    private Vector2D[] _systemB = null!;
-
     private Vector2D[] _forgeA = null!;
     private Vector2D[] _forgeB = null!;
 
     private Vector2D[] _normals = null!;
+
+    private Vector2D[] _systemA = null!;
+    private Vector2D[] _systemB = null!;
+
+    [Params(4_096, 65_536)] public int Length;
 
     [GlobalSetup]
     public void Setup()
@@ -412,8 +413,10 @@ public class Vector2DMathBenchmarks
     {
         var count = 0;
         for (var i = 0; i < Length; i++)
+        {
             if (_normals[i].IsNormalized())
                 count++;
+        }
 
         return count;
     }
