@@ -25,6 +25,12 @@ public sealed class Event
     public readonly string Name;
 
     /// <summary>
+    ///     Maintains a thread-safe array of actions that are subscribed to an event. Actions within this array are executed
+    ///     when the event is posted.
+    /// </summary>
+    private volatile Action[] _subscribers = [];
+
+    /// <summary>
     ///     Create a new event.
     /// </summary>
     /// <param name="id">Unique ID of the event.</param>
