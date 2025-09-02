@@ -54,6 +54,28 @@ public static class InputHandler
     /// </summary>
     private static MutableVector2D _mousePosition;
 
+    private static readonly Event KeyPressedEvent;
+    private static readonly Event KeyReleasedEvent;
+
+    private static readonly Event MousePressedEvent;
+    private static readonly Event MouseReleasedEvent;
+
+    static InputHandler()
+    {
+        EventBus.RegisterInternalEvents(
+            InternalEvent.KeyPressed,
+            InternalEvent.KeyReleased,
+            InternalEvent.MousePressed,
+            InternalEvent.MouseReleased
+        );
+
+        KeyPressedEvent = EventBus.GetByName(InternalEvent.KeyPressed.ToName());
+        KeyReleasedEvent = EventBus.GetByName(InternalEvent.KeyReleased.ToName());
+
+        MousePressedEvent = EventBus.GetByName(InternalEvent.MousePressed.ToName());
+        MouseReleasedEvent = EventBus.GetByName(InternalEvent.MouseReleased.ToName());
+    }
+
     /// <summary>
     ///     Change in scroll amount in the vertical direction from the last frame to the current frame.
     /// </summary>
@@ -120,6 +142,18 @@ public static class InputHandler
 
         if (snapshot.WheelDelta != 0F)
             ScrollDelta = snapshot.WheelDelta;
+
+        if (KeysPressed.Count > 0)
+            KeyPressedEvent.Post();
+
+        if (KeysReleased.Count > 0)
+            KeyReleasedEvent.Post();
+
+        if (MousePressed.Count > 0)
+            MousePressedEvent.Post();
+
+        if (MouseReleased.Count > 0)
+            MouseReleasedEvent.Post();
     }
 
     /// <summary>
