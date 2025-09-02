@@ -37,6 +37,13 @@ public class Display
         Window = window;
         _device = device;
         _commandList = device.ResourceFactory.CreateCommandList();
+
+        Window.Resized += () =>
+        {
+            if (_device.MainSwapchain.Framebuffer.Width != window.Width ||
+                _device.MainSwapchain.Framebuffer.Height != window.Height)
+                _device.ResizeMainWindow((uint)Window.Width, (uint)Window.Height);
+        };
     }
 
     /// <summary>
