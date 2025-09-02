@@ -7,7 +7,7 @@ namespace ForgeEvo.Core.Engine;
 /// <summary>
 ///     Core display class for the game.
 /// </summary>
-public class Display
+public class Display : IDisposable
 {
     /// <summary>
     ///     Veldrid command list.
@@ -50,6 +50,14 @@ public class Display
     ///     Raw SDL2 window for the display.
     /// </summary>
     internal Sdl2Window Window { get; }
+
+    public void Dispose()
+    {
+        _commandList.Dispose();
+        _device.Dispose();
+
+        GC.SuppressFinalize(this);
+    }
 
     /// <summary>
     ///     Clears the display to the specified background color.

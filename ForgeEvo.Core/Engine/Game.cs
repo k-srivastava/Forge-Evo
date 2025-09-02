@@ -32,13 +32,21 @@ public abstract class Game
     /// </summary>
     public void Run()
     {
-        while (_running)
+        try
         {
-            InputSnapshot input = Display.Window.PumpEvents();
-            InputHandler.Update(input);
+            while (_running)
+            {
+                InputSnapshot input = Display.Window.PumpEvents();
+                InputHandler.Update(input);
 
-            Update();
-            Render();
+                Update();
+                Render();
+            }
+        }
+
+        finally
+        {
+            Display.Dispose();
         }
     }
 
