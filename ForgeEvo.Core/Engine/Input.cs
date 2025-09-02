@@ -54,12 +54,29 @@ public static class InputHandler
     /// </summary>
     private static MutableVector2D _mousePosition;
 
+    /// <summary>
+    ///     Event fired when any key is pressed.
+    /// </summary>
     private static readonly Event KeyPressedEvent;
+
+    /// <summary>
+    ///     Event fired when any key is released.
+    /// </summary>
     private static readonly Event KeyReleasedEvent;
 
+    /// <summary>
+    ///     Event fired when any mouse button is pressed.
+    /// </summary>
     private static readonly Event MousePressedEvent;
+
+    /// <summary>
+    ///     Event fired when any mouse button is released.
+    /// </summary>
     private static readonly Event MouseReleasedEvent;
 
+    /// <summary>
+    ///     Static initializer that registers key and mouse internal events with the event bus.
+    /// </summary>
     static InputHandler()
     {
         EventBus.RegisterInternalEvents(
