@@ -14,14 +14,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.0.x
-    - name: Restore
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test (ForgeEvo.Core.Tests)
-      run: dotnet test ForgeEvo.Core.Tests/ForgeEvo.Core.Tests.csproj --no-build --verbosity normal
+      - uses: actions/checkout@v4
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+      - name: Restore
+        run: dotnet restore
+      - name: Build
+        run: dotnet build --no-restore
+      - name: Test (ForgeEvo.Core.Tests)
+        run: dotnet test ForgeEvo.Core.Tests/ForgeEvo.Core.Tests.csproj --no-build --verbosity normal
