@@ -13,5 +13,6 @@
   &lt;TestAncestor&gt;&#xD;
     &lt;TestId&gt;xUnit::60BD6313-EB65-4C68-A137-A8650C9CDF71::net9.0::ForgeEvo.Core.Tests.Math.Vector2DTest&lt;/TestId&gt;&#xD;
     &lt;TestId&gt;xUnit::60BD6313-EB65-4C68-A137-A8650C9CDF71::net9.0::ForgeEvo.Core.Tests.Engine.ColorTest&lt;/TestId&gt;&#xD;
+    &lt;TestId&gt;xUnit::60BD6313-EB65-4C68-A137-A8650C9CDF71::net9.0::ForgeEvo.Core.Tests.Engine.EventTest&lt;/TestId&gt;&#xD;
   &lt;/TestAncestor&gt;&#xD;
 &lt;/SessionState&gt;</s:String></wpf:ResourceDictionary>
