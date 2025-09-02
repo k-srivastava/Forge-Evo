@@ -15,12 +15,6 @@ public sealed class Event
     private readonly Lock _gate = new();
 
     /// <summary>
-    ///     Maintains a thread-safe array of actions that are subscribed to an event. Actions within this array are executed when
-    ///     the event is posted.
-    /// </summary>
-    private volatile Action[] _subscribers = [];
-
-    /// <summary>
     ///     Unique ID of the event.
     /// </summary>
     public readonly int Id;
@@ -359,9 +353,40 @@ public static class EventBus
 /// </summary>
 public enum InternalEvent
 {
-    MouseClicked,
-    MouseDepressed,
-    KeyPressed
+    /// <summary>
+    ///     Event fired once when the <see cref="Game" /> has completed initialization.
+    /// </summary>
+    GameInitialized,
+
+    /// <summary>
+    ///     Event fired every time the <see cref="Game" /> is updated in the main game loop.
+    /// </summary>
+    GameUpdated,
+
+    /// <summary>
+    ///     Event fired every time the <see cref="Game" /> is rendered in the main game loop.
+    /// </summary>
+    GameRendered,
+
+    /// <summary>
+    ///     Event fired from the <see cref="InputHandler" /> when any key is pressed.
+    /// </summary>
+    KeyPressed,
+
+    /// <summary>
+    ///     Event fired from the <see cref="InputHandler" /> when any key is released.
+    /// </summary>
+    KeyReleased,
+
+    /// <summary>
+    ///     Event fired from the <see cref="InputHandler" /> when any mouse button is pressed.
+    /// </summary>
+    MousePressed,
+
+    /// <summary>
+    ///     Event fired from the <see cref="InputHandler" /> when any mouse button is released.
+    /// </summary>
+    MouseReleased
 }
 
 /// <summary>
@@ -380,9 +405,14 @@ public static class InternalEventExtensions
     /// </exception>
     public static string ToName(this InternalEvent @event) => @event switch
     {
-        InternalEvent.MouseClicked => "<Mouse-Clicked>",
-        InternalEvent.MouseDepressed => "<Mouse-Depressed>",
+        InternalEvent.GameInitialized => "<Game-Initialized>",
+        InternalEvent.GameUpdated => "<Game-Updated>",
+        InternalEvent.GameRendered => "<Game-Rendered>",
         InternalEvent.KeyPressed => "<Key-Pressed>",
+        InternalEvent.KeyReleased => "<Key-Released>",
+        InternalEvent.MousePressed => "<Mouse-Pressed>",
+        InternalEvent.MouseReleased => "<Mouse-Released>",
+
         _ => throw new ArgumentOutOfRangeException(nameof(@event), @event, null)
     };
 }
