@@ -109,6 +109,11 @@ public static class InputHandler
     public static Vector2D MouseDelta => _mouseDelta;
 
     /// <summary>
+    ///     Whether the mouse has moved since the last frame.
+    /// </summary>
+    public static bool DidMouseMove => _mouseDelta.LengthSquared() > 0;
+
+    /// <summary>
     ///     Update the input handler with the latest keyboard and mouse data. Ideally called every game-loop.
     /// </summary>
     /// <param name="snapshot">Current Veldrid input snapshot which contains the latest keyboard and mouse data.</param>

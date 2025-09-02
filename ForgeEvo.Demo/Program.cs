@@ -28,7 +28,7 @@ internal class DemoGame() : Game(title: "Forge Evo Demo")
         if (InputHandler.IsKeyPressed(Key.Space))
             _demoEvent.Post();
 
-        if (InputHandler.MouseDelta.Length() > 0)
+        if (InputHandler.DidMouseMove)
         {
             Vector2D mousePosition = InputHandler.MousePosition;
             Console.WriteLine($"Mouse moved to X: {mousePosition.X}, Y: {mousePosition.Y}.");
