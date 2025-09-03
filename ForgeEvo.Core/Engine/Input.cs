@@ -96,7 +96,7 @@ public static class InputHandler
     /// <summary>
     ///     Change in scroll amount in the vertical direction from the last frame to the current frame.
     /// </summary>
-    public static float ScrollDelta { get; private set; }
+    public static int ScrollDelta { get; private set; }
 
     /// <summary>
     ///     Position of the mouse pointer in the current frame.
@@ -126,7 +126,7 @@ public static class InputHandler
         MouseReleased.Clear();
 
         _mouseDelta = Vector2D.Zero;
-        ScrollDelta = 0F;
+        ScrollDelta = 0;
 
         _mousePosition = new(snapshot.MousePosition);
         _mouseDelta = _mousePosition - _mouseLastPosition;
@@ -163,7 +163,7 @@ public static class InputHandler
         }
 
         if (snapshot.WheelDelta != 0F)
-            ScrollDelta = snapshot.WheelDelta;
+            ScrollDelta = (int)snapshot.WheelDelta;
 
         if (KeysPressed.Count > 0)
             KeyPressedEvent.Post();
