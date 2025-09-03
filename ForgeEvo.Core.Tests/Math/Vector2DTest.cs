@@ -25,8 +25,8 @@ public class Vector2DTest
     public void Length_And_LengthSquared_AreConsistent()
     {
         Vector2D vector = new(3F, 4F);
-        Assert.Equal(5f, vector.Length(), 5);
-        Assert.Equal(25f, vector.LengthSquared(), 5);
+        Assert.Equal(5F, vector.Length(), 5);
+        Assert.Equal(25F, vector.LengthSquared(), 5);
     }
 
     [Fact]
