@@ -34,7 +34,7 @@ public abstract class Game
     private bool _running = true;
 
     /// <summary>
-    ///     Create a new game and register its corresponding events.. Provides core functionality to manage the game loop,
+    ///     Create a new game and register its corresponding events. Provides core functionality to manage the game loop,
     ///     rendering, and updating logic.
     /// </summary>
     protected Game(uint width = 800, uint height = 600, string title = "Forge Evo")
