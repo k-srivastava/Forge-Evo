@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
-using SixLabors.ImageSharp.PixelFormats;
 using Veldrid;
 
 namespace ForgeEvo.Core.Engine;
@@ -173,8 +172,6 @@ public readonly struct Color : IEquatable<Color>
     /// </summary>
     /// <returns><see cref="RgbaFloat" /> with channel values.</returns>
     internal RgbaFloat ToRgbaFloat() => new(Red / 255F, Green / 255F, Blue / 255F, Alpha / 255F);
-
-    internal Rgba32 ToRgba32() => new(Red, Green, Blue, Alpha);
 
     #endregion
 
