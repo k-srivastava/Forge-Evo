@@ -17,7 +17,7 @@ public class Display : IDisposable
     /// <summary>
     ///     Veldrid graphics device.
     /// </summary>
-    private readonly GraphicsDevice _device;
+    internal readonly GraphicsDevice Device;
 
     /// <summary>
     ///     Create a new display using the SLD2 window.
@@ -35,14 +35,14 @@ public class Display : IDisposable
         );
 
         Window = window;
-        _device = device;
+        Device = device;
         _commandList = device.ResourceFactory.CreateCommandList();
 
         Window.Resized += () =>
         {
-            if (_device.MainSwapchain.Framebuffer.Width != window.Width ||
-                _device.MainSwapchain.Framebuffer.Height != window.Height)
-                _device.ResizeMainWindow((uint)Window.Width, (uint)Window.Height);
+            if (Device.MainSwapchain.Framebuffer.Width != window.Width ||
+                Device.MainSwapchain.Framebuffer.Height != window.Height)
+                Device.ResizeMainWindow((uint)Window.Width, (uint)Window.Height);
         };
     }
 
@@ -54,7 +54,7 @@ public class Display : IDisposable
     public void Dispose()
     {
         _commandList.Dispose();
-        _device.Dispose();
+        Device.Dispose();
 
         GC.SuppressFinalize(this);
     }
@@ -66,11 +66,12 @@ public class Display : IDisposable
     public void Clear(Color color)
     {
         _commandList.Begin();
-        _commandList.SetFramebuffer(_device.MainSwapchain.Framebuffer);
+
+        _commandList.SetFramebuffer(Device.MainSwapchain.Framebuffer);
         _commandList.ClearColorTarget(0, color.ToRgbaFloat());
         _commandList.End();
 
-        _device.SubmitCommands(_commandList);
-        _device.SwapBuffers(_device.MainSwapchain);
+        Device.SubmitCommands(_commandList);
+        Device.SwapBuffers(Device.MainSwapchain);
     }
 }
