@@ -450,6 +450,15 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     public static MutableVector2D operator +(MutableVector2D a, MutableVector2D b) => new(a._vector + b._vector);
 
     /// <summary>
+    ///     Compute the sum of two vectors.
+    /// </summary>
+    /// <param name="a">First vector.</param>
+    /// <param name="b">Second vector.</param>
+    /// <returns>Summed vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static MutableVector2D operator +(MutableVector2D a, Vector2D b) => new(a._vector + b.Vector);
+
+    /// <summary>
     ///     Compute the difference between two vectors.
     /// </summary>
     /// <param name="a">First vector.</param>
@@ -457,6 +466,15 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <returns>Difference vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static MutableVector2D operator -(MutableVector2D a, MutableVector2D b) => new(a._vector - b._vector);
+
+    /// <summary>
+    ///     Compute the difference between two vectors.
+    /// </summary>
+    /// <param name="a">First vector.</param>
+    /// <param name="b">Second vector.</param>
+    /// <returns>Difference vector.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static MutableVector2D operator -(MutableVector2D a, Vector2D b) => new(a._vector - b.Vector);
 
     /// <summary>
     ///     Multiply a vector with a scalar.
@@ -498,6 +516,15 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     public static float operator *(MutableVector2D a, MutableVector2D b) => Vector2.Dot(a._vector, b._vector);
 
     /// <summary>
+    ///     Compute the dot product between two vectors.
+    /// </summary>
+    /// <param name="a">First vector.</param>
+    /// <param name="b">Second vector.</param>
+    /// <returns>Dot product of the two vectors.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float operator *(MutableVector2D a, Vector2D b) => Vector2.Dot(a._vector, b.Vector);
+
+    /// <summary>
     ///     Compute the cross-product of two vectors.
     /// </summary>
     /// <param name="a">First vector.</param>
@@ -506,6 +533,16 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static float operator ^(MutableVector2D a, MutableVector2D b) =>
         a._vector.X * b._vector.Y - a._vector.Y * b._vector.X;
+
+    /// <summary>
+    ///     Compute the cross-product of two vectors.
+    /// </summary>
+    /// <param name="a">First vector.</param>
+    /// <param name="b">Second vector.</param>
+    /// <returns>Cross product of the two vectors.</returns>
+    [MethodImpl(MethodImplOptions.AggressiveInlining)]
+    public static float operator ^(MutableVector2D a, Vector2D b) =>
+        a._vector.X * b.Vector.Y - a._vector.Y * b.Vector.X;
 
     /// <summary>
     ///     Negate the vector.
