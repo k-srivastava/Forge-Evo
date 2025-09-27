@@ -3,8 +3,6 @@ using System.Runtime.CompilerServices;
 
 namespace ForgeEvo.Core.Engine;
 
-// TODO: Consider moving IDs to GUIDs instead.
-
 /// <summary>
 ///     Represents a thread-safe event system that allows subscribing, unsubscribing, and posting notifications to all
 ///     subscribers.
