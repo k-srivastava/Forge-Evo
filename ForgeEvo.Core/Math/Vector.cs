@@ -51,14 +51,14 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     public static readonly Vector2D One = new(1F, 1F);
 
     /// <summary>
-    ///     Default up vector with its Y component set to 1.
+    ///     Default up vector with its Y component set to -1.
     /// </summary>
-    public static readonly Vector2D Up = new(0F, 1F);
+    public static readonly Vector2D Up = new(0F, -1F);
 
     /// <summary>
-    ///     Default down vector with its Y component set to -1.
+    ///     Default down vector with its Y component set to 1.
     /// </summary>
-    public static readonly Vector2D Down = new(0F, -1F);
+    public static readonly Vector2D Down = new(0F, 1F);
 
     /// <summary>
     ///     Default left vector with its X component set to 01.
