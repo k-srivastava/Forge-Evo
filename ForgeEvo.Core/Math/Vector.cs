@@ -9,7 +9,7 @@ namespace ForgeEvo.Core.Math;
 public readonly struct Vector2D : IEquatable<Vector2D>
 {
     /// <summary>
-    ///     Internal <c>Vector2</c> storage to enable SIMD operations.
+    ///     Internal <see cref="Vector2" /> storage to enable SIMD operations.
     /// </summary>
     internal readonly Vector2 Vector;
 
@@ -22,9 +22,9 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     public Vector2D(float x, float y) => Vector = new(x, y);
 
     /// <summary>
-    ///     Create a new vector using <c>Vector2</c> directly.
+    ///     Create a new vector using <see cref="Vector2" /> directly.
     /// </summary>
-    /// <param name="vector"><c>Vector2</c> to convert into a Forge <c>Vector2D</c>.</param>
+    /// <param name="vector"><see cref="Vector2" /> to convert into a Forge <c>Vector2D</c>.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D(Vector2 vector) => Vector = vector;
 
@@ -61,7 +61,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     public static readonly Vector2D Down = new(0F, 1F);
 
     /// <summary>
-    ///     Default left vector with its X component set to 01.
+    ///     Default left vector with its X component set to -1.
     /// </summary>
     public static readonly Vector2D Left = new(-1F, 0F);
 
@@ -75,15 +75,15 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     #region Conversions
 
     /// <summary>
-    ///     Convert Forge <c>Vector2D</c> into a standard <c>Vector2</c>.
+    ///     Convert Forge <c>Vector2D</c> into a standard <see cref="Vector2" />.
     /// </summary>
     /// <param name="vector">Forge vector to convert.</param>
-    /// <returns>Standard <c>Vector2</c> with the same components.</returns>
+    /// <returns>Standard <see cref="Vector2" /> with the same components.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector2(Vector2D vector) => vector.Vector;
 
     /// <summary>
-    ///     Convert standard <c>Vector2</c> into a Forge <c>Vector2D</c>.
+    ///     Convert a standard <see cref="Vector2" /> into a Forge <c>Vector2D</c>.
     /// </summary>
     /// <param name="vector">Standard vector to convert.</param>
     /// <returns>Forge <c>Vector2D</c> with the same components.</returns>
@@ -361,7 +361,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
 public struct MutableVector2D : IEquatable<MutableVector2D>
 {
     /// <summary>
-    ///     Internal <c>Vector2</c> storage to enable SIMD operations.
+    ///     Internal <see cref="Vector2" /> storage to enable SIMD operations.
     /// </summary>
     private Vector2 _vector;
 
@@ -374,9 +374,9 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     public MutableVector2D(float x, float y) => _vector = new(x, y);
 
     /// <summary>
-    ///     Create a new vector using <c>Vector2</c> directly.
+    ///     Create a new vector using <see cref="Vector2" /> directly.
     /// </summary>
-    /// <param name="vector"><c>Vector2</c> to convert into a Forge <c>MutableVector2D</c>.</param>
+    /// <param name="vector"><see cref="Vector2" /> to convert into a Forge <c>MutableVector2D</c>.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public MutableVector2D(Vector2 vector) => _vector = vector;
 
@@ -405,15 +405,15 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     #region Conversions
 
     /// <summary>
-    ///     Convert Forge <c>MutableVector2D</c> into a standard <c>Vector2</c>.
+    ///     Convert Forge <c>MutableVector2D</c> into a standard <see cref="Vector2" />.
     /// </summary>
     /// <param name="vector">Forge vector to convert.</param>
-    /// <returns>Standard <c>Vector2</c> with the same components.</returns>
+    /// <returns>Standard <see cref="Vector2" /> with the same components.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static implicit operator Vector2(MutableVector2D vector) => vector._vector;
 
     /// <summary>
-    ///     Convert standard <c>Vector2</c> into a Forge <c>MutableVector2D</c>.
+    ///     Convert a standard <see cref="Vector2" /> into a Forge <c>MutableVector2D</c>.
     /// </summary>
     /// <param name="vector">Standard vector to convert.</param>
     /// <returns>Forge <c>MutableVector2D</c> with the same components.</returns>
