@@ -11,7 +11,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <summary>
     ///     Internal <c>Vector2</c> storage to enable SIMD operations.
     /// </summary>
-    private readonly Vector2 _vector;
+    internal readonly Vector2 Vector;
 
     /// <summary>
     ///     Create a new vector using its components.
@@ -19,24 +19,24 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="x">X coordinate of the vector.</param>
     /// <param name="y">Y coordinate of the vector.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2D(float x, float y) => _vector = new(x, y);
+    public Vector2D(float x, float y) => Vector = new(x, y);
 
     /// <summary>
     ///     Create a new vector using <c>Vector2</c> directly.
     /// </summary>
     /// <param name="vector"><c>Vector2</c> to convert into a Forge <c>Vector2D</c>.</param>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2D(Vector2 vector) => _vector = vector;
+    public Vector2D(Vector2 vector) => Vector = vector;
 
     /// <summary>
     ///     X component of the 2D vector.
     /// </summary>
-    public float X => _vector.X;
+    public float X => Vector.X;
 
     /// <summary>
     ///     Y component of the 2D vector.
     /// </summary>
-    public float Y => _vector.Y;
+    public float Y => Vector.Y;
 
     #region Constants
 
@@ -80,7 +80,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="vector">Forge vector to convert.</param>
     /// <returns>Standard <c>Vector2</c> with the same components.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static implicit operator Vector2(Vector2D vector) => vector._vector;
+    public static implicit operator Vector2(Vector2D vector) => vector.Vector;
 
     /// <summary>
     ///     Convert standard <c>Vector2</c> into a Forge <c>Vector2D</c>.
@@ -101,7 +101,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="b">Second vector.</param>
     /// <returns>Summed vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2D operator +(Vector2D a, Vector2D b) => new(a._vector + b._vector);
+    public static Vector2D operator +(Vector2D a, Vector2D b) => new(a.Vector + b.Vector);
 
     /// <summary>
     ///     Compute the difference between two vectors.
@@ -110,7 +110,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="b">Second vector.</param>
     /// <returns>Difference vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2D operator -(Vector2D a, Vector2D b) => new(a._vector - b._vector);
+    public static Vector2D operator -(Vector2D a, Vector2D b) => new(a.Vector - b.Vector);
 
     /// <summary>
     ///     Multiply a vector with a scalar.
@@ -119,7 +119,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="scalar">Scalar to multiply the vector by.</param>
     /// <returns>Vector multiplied by the scalar.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2D operator *(Vector2D vector, float scalar) => new(vector._vector * scalar);
+    public static Vector2D operator *(Vector2D vector, float scalar) => new(vector.Vector * scalar);
 
     /// <summary>
     ///     Multiply a vector with a scalar.
@@ -128,7 +128,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="vector">Vector to multiply.</param>
     /// <returns>Vector multiplied by the scalar.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2D operator *(float scalar, Vector2D vector) => new(vector._vector * scalar);
+    public static Vector2D operator *(float scalar, Vector2D vector) => new(vector.Vector * scalar);
 
     /// <summary>
     ///     Divide a vector by a scalar.
@@ -140,7 +140,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2D operator /(Vector2D vector, float scalar) => scalar == 0F
         ? throw new DivideByZeroException("Cannot divide a vector by zero.")
-        : new(vector._vector / scalar);
+        : new(vector.Vector / scalar);
 
     /// <summary>
     ///     Compute the dot product between two vectors.
@@ -149,7 +149,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="b">Second vector.</param>
     /// <returns>Dot product of the two vectors.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float operator *(Vector2D a, Vector2D b) => Vector2.Dot(a._vector, b._vector);
+    public static float operator *(Vector2D a, Vector2D b) => Vector2.Dot(a.Vector, b.Vector);
 
     /// <summary>
     ///     Compute the cross-product of two vectors.
@@ -158,7 +158,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="b">Second vector.</param>
     /// <returns>Cross product of the two vectors.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float operator ^(Vector2D a, Vector2D b) => a._vector.X * b._vector.Y - a._vector.Y * b._vector.X;
+    public static float operator ^(Vector2D a, Vector2D b) => a.Vector.X * b.Vector.Y - a.Vector.Y * b.Vector.X;
 
     /// <summary>
     ///     Negate the vector.
@@ -166,7 +166,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <param name="vector">Vector to negate.</param>
     /// <returns>Negation of the vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2D operator -(Vector2D vector) => new(-vector._vector);
+    public static Vector2D operator -(Vector2D vector) => new(-vector.Vector);
 
     // ReSharper disable CompareOfFloatsByEqualityOperator
     /// <summary>
@@ -197,14 +197,14 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <returns>Length, or magnitude of the vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float Length() => _vector.Length();
+    public float Length() => Vector.Length();
 
     /// <summary>
     ///     Compute the squared length of the vector. Useful in hot-loops due to lack of a square-root operation.
     /// </summary>
     /// <returns>Square of the length, or magnitude of the vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float LengthSquared() => _vector.LengthSquared();
+    public float LengthSquared() => Vector.LengthSquared();
 
     /// <summary>
     ///     Compute the normal of the vector, i.e., set its length to 1 while preserving its direction.
@@ -214,10 +214,10 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D Normal()
     {
-        float length = _vector.Length();
+        float length = Vector.Length();
         return length == 0F
             ? throw new DivideByZeroException("Cannot normalize a vector of zero length.")
-            : new(_vector / length);
+            : new(Vector / length);
     }
 
     /// <summary>
@@ -225,7 +225,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// </summary>
     /// <returns>Orthogonal vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2D Orthogonal() => new(_vector.Y, -_vector.X);
+    public Vector2D Orthogonal() => new(Vector.Y, -Vector.X);
 
     /// <summary>
     ///     Scale a vector to a given length while preserving its direction.
@@ -236,10 +236,10 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public Vector2D ScaleTo(float scale)
     {
-        float length = _vector.Length();
+        float length = Vector.Length();
         return length == 0F
             ? throw new DivideByZeroException("Cannot scale a vector of zero length.")
-            : new(_vector * scale / length);
+            : new(Vector * scale / length);
     }
 
     /// <summary>
@@ -254,8 +254,8 @@ public readonly struct Vector2D : IEquatable<Vector2D>
         if (!normal.IsNormalized())
             throw new ArgumentException("Cannot reflect a vector along a normal of invalid length.");
 
-        float dot = Vector2.Dot(_vector, normal._vector);
-        return new(_vector - 2f * dot * normal._vector);
+        float dot = Vector2.Dot(Vector, normal.Vector);
+        return new(Vector - 2f * dot * normal.Vector);
     }
 
     /// <summary>
@@ -266,11 +266,11 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public float Angle(Vector2D to)
     {
-        float denominator = _vector.Length() * to._vector.Length();
+        float denominator = Vector.Length() * to.Vector.Length();
         if (denominator == 0F)
             return 0F;
 
-        float cosine = Vector2.Dot(_vector, to._vector) / denominator;
+        float cosine = Vector2.Dot(Vector, to.Vector) / denominator;
         float clampedCosine = MathF.Min(1F, MathF.Max(-1F, cosine));
         return MathF.Acos(clampedCosine);
     }
@@ -283,7 +283,7 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public bool IsNormalized(float tolerance = 0.0001F)
     {
-        float lengthSquared = _vector.LengthSquared();
+        float lengthSquared = Vector.LengthSquared();
         float bound = 2F * tolerance + tolerance * tolerance;
 
         return MathF.Abs(lengthSquared - 1F) < bound;
@@ -302,8 +302,8 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     {
         return type switch
         {
-            Math.Distance.Euclidean => Vector2.Distance(a._vector, b._vector),
-            Math.Distance.Manhattan => MathF.Abs(a._vector.X - b._vector.X) + MathF.Abs(a._vector.Y - b._vector.Y),
+            Math.Distance.Euclidean => Vector2.Distance(a.Vector, b.Vector),
+            Math.Distance.Manhattan => MathF.Abs(a.Vector.X - b.Vector.X) + MathF.Abs(a.Vector.Y - b.Vector.Y),
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
     }
@@ -322,9 +322,9 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     {
         return type switch
         {
-            Math.Distance.Euclidean => Vector2.DistanceSquared(a._vector, b._vector),
+            Math.Distance.Euclidean => Vector2.DistanceSquared(a.Vector, b.Vector),
             Math.Distance.Manhattan => MathF.Pow(
-                MathF.Abs(a._vector.X - b._vector.X) + MathF.Abs(a._vector.Y - b._vector.Y), 2F
+                MathF.Abs(a.Vector.X - b.Vector.X) + MathF.Abs(a.Vector.Y - b.Vector.Y), 2F
             ),
             _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
         };
@@ -339,18 +339,18 @@ public readonly struct Vector2D : IEquatable<Vector2D>
     /// <returns>Linearly interpolated vector between the start and end.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
     public static Vector2D LinearInterpolation(Vector2D start, Vector2D end, float weight) =>
-        new(Vector2.Lerp(start._vector, end._vector, weight));
+        new(Vector2.Lerp(start.Vector, end.Vector, weight));
 
     #endregion
 
     #region Equality / Overrides
 
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public bool Equals(Vector2D other) => _vector.X.Equals(other._vector.X) && _vector.Y.Equals(other._vector.Y);
+    public bool Equals(Vector2D other) => Vector.X.Equals(other.Vector.X) && Vector.Y.Equals(other.Vector.Y);
 
     public override bool Equals(object? obj) => obj is Vector2D other && Equals(other);
 
-    public override int GetHashCode() => _vector.GetHashCode();
+    public override int GetHashCode() => Vector.GetHashCode();
 
     #endregion
 }
