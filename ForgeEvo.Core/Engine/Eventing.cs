@@ -275,8 +275,8 @@ public static class EventBus
     /// <summary>
     ///     Retrieves an event by its unique identifier.
     /// </summary>
-    /// <param name="id">The unique ID of the event to retrieve.</param>
-    /// <returns>The <see cref="Event" /> associated with the specified ID.</returns>
+    /// <param name="id">The unique identifier of the event.</param>
+    /// <returns>The <see cref="Event" /> associated with the given ID.</returns>
     /// <exception cref="InvalidOperationException">Thrown if an event with the specified ID does not exist.</exception>
     public static Event GetById(int id) => !TryGetById(id, out Event? @event)
         ? throw new InvalidOperationException($"Event with id {id} does not exist.")
