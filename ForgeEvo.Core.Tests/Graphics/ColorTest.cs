@@ -1,8 +1,8 @@
-﻿using ForgeEvo.Core.Engine;
+﻿using ForgeEvo.Core.Graphics;
 using JetBrains.Annotations;
 using Xunit;
 
-namespace ForgeEvo.Core.Tests.Engine;
+namespace ForgeEvo.Core.Tests.Graphics;
 
 [TestSubject(typeof(Color))]
 public class ColorTest

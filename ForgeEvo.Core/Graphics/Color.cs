@@ -5,7 +5,7 @@ using System.Runtime.Intrinsics.Arm;
 using System.Runtime.Intrinsics.X86;
 using Veldrid;
 
-namespace ForgeEvo.Core.Engine;
+namespace ForgeEvo.Core.Graphics;
 
 /// <summary>
 ///     Represents a color in ARGB format with 32-bit precision.
