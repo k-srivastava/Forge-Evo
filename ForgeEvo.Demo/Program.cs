@@ -1,4 +1,4 @@
 ﻿using ForgeEvo.Demo;
 
-var demo = new SpriteGame();
+var demo = new PongGame();
 demo.Run();
