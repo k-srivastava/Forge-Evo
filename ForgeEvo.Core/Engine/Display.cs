@@ -88,7 +88,7 @@ public class Display : IDisposable
     ///     Clears the display to the specified background color and renders all the renderers.
     /// </summary>
     /// <param name="color">The color used to clear the display.</param>
-    public void Clear(Color color)
+    public void Render(Color color)
     {
         _commandList.Begin();
 

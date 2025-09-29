@@ -41,7 +41,7 @@ internal class SpriteGame() : Game(title: "Image Demo")
         _flowerImage.Render();
         _staticImage.Render();
 
-        Display.Clear(_background);
+        Display.Render(_background);
     }
 
     private void ResolveMovement()

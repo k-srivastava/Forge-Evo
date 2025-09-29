@@ -38,6 +38,6 @@ internal class ColorGame() : Game(title: "Color & Mouse Demo")
 
     protected override void Render()
     {
-        Display.Clear(ClearColor);
+        Display.Render(ClearColor);
     }
 }
