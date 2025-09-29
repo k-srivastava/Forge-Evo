@@ -596,7 +596,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <returns>Normal of the vector.</returns>
     /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be normalized.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2D Normal()
+    public MutableVector2D Normal()
     {
         float length = _vector.Length();
         return length == 0F
@@ -623,7 +623,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// </summary>
     /// <returns>Orthogonal vector.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2D Orthogonal() => new(_vector.Y, -_vector.X);
+    public MutableVector2D Orthogonal() => new(_vector.Y, -_vector.X);
 
     /// <summary>
     ///     Orthogonalize the vector itself.
@@ -656,7 +656,7 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <returns>Scaled vector with the given length and the same direction.</returns>
     /// <exception cref="DivideByZeroException">Vectors of zero lengths cannot be scaled.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2D ScaleTo(float scale)
+    public MutableVector2D ScaleTo(float scale)
     {
         float length = _vector.Length();
         return length == 0F
@@ -670,13 +670,13 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="normal">Normal of the reflection.</param>
     /// <exception cref="DivideByZeroException">The normal must be normalized.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public void Reflect(MutableVector2D normal)
+    public void Reflect(Vector2D normal)
     {
         if (!normal.IsNormalized())
             throw new DivideByZeroException("Cannot reflect a vector along a normal of invalid length.");
 
-        float dot = Vector2.Dot(_vector, normal._vector);
-        _vector -= 2f * dot * normal._vector;
+        float dot = Vector2.Dot(_vector, normal.Vector);
+        _vector -= 2f * dot * normal.Vector;
     }
 
     /// <summary>
@@ -686,9 +686,9 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <returns>Reflected vector with respect to the normal.</returns>
     /// <exception cref="ArgumentException">The normal must be normalized.</exception>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public Vector2D ReflectTo(MutableVector2D normal) => !normal.IsNormalized()
+    public MutableVector2D ReflectTo(Vector2D normal) => !normal.IsNormalized()
         ? throw new DivideByZeroException("Cannot reflect a vector along a normal of invalid length.")
-        : new(_vector - 2f * Vector2.Dot(_vector, normal._vector) * normal._vector);
+        : new(_vector - 2f * Vector2.Dot(_vector, normal.Vector) * normal.Vector);
 
     /// <summary>
     ///     Calculate the unsigned angle between one vector and another.
@@ -696,13 +696,13 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     /// <param name="to">Vector to which the angle is to be measured.</param>
     /// <returns>Unsigned angle between the two vectors in radians.</returns>
     [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public float Angle(MutableVector2D to)
+    public float Angle(Vector2D to)
     {
-        float denominator = _vector.Length() * to._vector.Length();
+        float denominator = _vector.Length() * to.Vector.Length();
         if (denominator == 0F)
             return 0F;
 
-        float cosine = Vector2.Dot(_vector, to._vector) / denominator;
+        float cosine = Vector2.Dot(_vector, to.Vector) / denominator;
         float clampedCosine = MathF.Min(1F, MathF.Max(-1F, cosine));
         return MathF.Acos(clampedCosine);
     }
@@ -720,58 +720,6 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
 
         return MathF.Abs(lengthSquared - 1F) < bound;
     }
-
-    /// <summary>
-    ///     Calculate the distance between two vectors using a distance-type.
-    /// </summary>
-    /// <param name="a">First vector.</param>
-    /// <param name="b">Second vector.</param>
-    /// <param name="type">Type of distance to be calculated.</param>
-    /// <returns>Distance between the two vectors.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Distance type must be valid.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float Distance(MutableVector2D a, MutableVector2D b, Distance type = Math.Distance.Euclidean)
-    {
-        return type switch
-        {
-            Math.Distance.Euclidean => Vector2.Distance(a._vector, b._vector),
-            Math.Distance.Manhattan => MathF.Abs(a._vector.X - b._vector.X) + MathF.Abs(a._vector.Y - b._vector.Y),
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-        };
-    }
-
-    /// <summary>
-    ///     Calculate the square of the distance between two vectors using a distance-type. Most useful for Euclidean distance
-    ///     in hot-loops due to lack of a square-root operation.
-    /// </summary>
-    /// <param name="a">First vector.</param>
-    /// <param name="b">Second vector.</param>
-    /// <param name="type">Type of distance to be calculated.</param>
-    /// <returns>Square of the distance between the two vectors.</returns>
-    /// <exception cref="ArgumentOutOfRangeException">Distance type must be valid.</exception>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static float DistanceSquared(MutableVector2D a, MutableVector2D b, Distance type = Math.Distance.Euclidean)
-    {
-        return type switch
-        {
-            Math.Distance.Euclidean => Vector2.DistanceSquared(a._vector, b._vector),
-            Math.Distance.Manhattan => MathF.Pow(
-                MathF.Abs(a._vector.X - b._vector.X) + MathF.Abs(a._vector.Y - b._vector.Y), 2F
-            ),
-            _ => throw new ArgumentOutOfRangeException(nameof(type), type, null)
-        };
-    }
-
-    /// <summary>
-    ///     Compute a linear interpolation of a vector with respect to a given weight along both axes.
-    /// </summary>
-    /// <param name="start">Start vector.</param>
-    /// <param name="end">End vector.</param>
-    /// <param name="weight">Weight for the interpolation function.</param>
-    /// <returns>Linearly interpolated vector between the start and end.</returns>
-    [MethodImpl(MethodImplOptions.AggressiveInlining)]
-    public static Vector2D LinearInterpolation(MutableVector2D start, MutableVector2D end, float weight) =>
-        new(Vector2.Lerp(start._vector, end._vector, weight));
 
     #endregion
 
