@@ -290,13 +290,9 @@ public sealed class SpriteRenderer(
 
     #region Nested type: Vertex
 
-    #region Nested Type: Vertex
-
     // ReSharper disable NotAccessedPositionalProperty.Local
     private readonly record struct Vertex(Vector2D Position, Vector2D TextureCoordinate);
     // ReSharper restore NotAccessedPositionalProperty.Local
-
-    #endregion
 
     #endregion
 }
