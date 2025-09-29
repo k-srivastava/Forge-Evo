@@ -12,4 +12,13 @@
       <PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="Graphics\Shaders\sprite.frag.hlsl">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="Graphics\Shaders\sprite.vert.hlsl">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
 </Project>
