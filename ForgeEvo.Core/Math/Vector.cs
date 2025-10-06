@@ -350,6 +350,8 @@ public readonly struct Vector2D : IEquatable<Vector2D>
 
     public override bool Equals(object? obj) => obj is Vector2D other && Equals(other);
 
+    public override string ToString() => $"Vector2D(X: {Vector.X}, Y: {Vector.Y})";
+
     public override int GetHashCode() => Vector.GetHashCode();
 
     #endregion
@@ -729,6 +731,8 @@ public struct MutableVector2D : IEquatable<MutableVector2D>
     public bool Equals(MutableVector2D other) => _vector.X.Equals(other._vector.X) && _vector.Y.Equals(other._vector.Y);
 
     public override bool Equals(object? obj) => obj is MutableVector2D other && Equals(other);
+
+    public override string ToString() => $"MutableVector2D(X: {_vector.X}, Y: {_vector.Y})";
 
     public override int GetHashCode() => HashCode.Combine(_vector.X, _vector.Y);
 

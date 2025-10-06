@@ -182,6 +182,8 @@ public readonly struct Color : IEquatable<Color>
 
     public override bool Equals(object? obj) => obj is Color other && Equals(other);
 
+    public override string ToString() => $"Color(Red: {Red}, Green: {Green}, Blue: {Blue}, Alpha: {Alpha})";
+
     public override int GetHashCode() => (int)_argb;
 
     #endregion

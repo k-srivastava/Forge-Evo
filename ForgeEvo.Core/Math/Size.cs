@@ -141,6 +141,8 @@ public readonly struct Size2D(uint width, uint height) : IEquatable<Size2D>
 
     public override bool Equals(object? obj) => obj is Size2D other && Equals(other);
 
+    public override string ToString() => $"Size2D(Width: {Width}, Height: {Height})";
+
     public override int GetHashCode() => HashCode.Combine(Width, Height);
 
     #endregion
