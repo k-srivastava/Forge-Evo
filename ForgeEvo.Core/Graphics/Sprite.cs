@@ -88,6 +88,8 @@ public class Sprite : IDisposable
     }
 
     #endregion
+
+    public override string ToString() => $"Sprite(ID: {Id}, Size: {Size})";
 }
 
 /// <summary>

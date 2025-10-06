@@ -136,7 +136,7 @@ public sealed class Event
         }
     }
 
-    public override string ToString() => $"Event(Name={Name}, Id={Id}, Subscribers={Count()})";
+    public override string ToString() => $"Event(Name: {Name}, ID: {Id}, Subscriber Count: {Count()})";
 
     /// <summary>
     ///     Retrieves the current number of subscribers for the event.

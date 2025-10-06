@@ -91,4 +91,6 @@ public struct Image : IDisposable
     {
         _display.AddToRenderList(this);
     }
+
+    public override string ToString() => $"Image(Sprite: {Sprite}, Position: {Position}, Scale: {Scale})";
 }
