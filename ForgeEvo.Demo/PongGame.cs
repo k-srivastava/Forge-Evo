@@ -140,7 +140,10 @@ public class PongGame() : Game(title: "Pong Demo")
             float ballBottom = _ballImage.Position.Y + _ballImage.Size.Height;
 
             if (ballTop >= paddleTop && ballBottom <= paddleBottom)
+            {
+                _ballImage.Position.X = player1PaddleRight + 5;
                 _ballDirection.Reflect(Vector2D.Right);
+            }
         }
 
         float ballRight = _ballImage.Position.X + _ballImage.Size.Width;
@@ -155,7 +158,10 @@ public class PongGame() : Game(title: "Pong Demo")
             float ballBottom = _ballImage.Position.Y + _ballImage.Size.Height;
 
             if (ballTop >= paddleTop && ballBottom <= paddleBottom)
+            {
+                _ballImage.Position.X = player2PaddleLeft - (_ballImage.Size.Width + 5);
                 _ballDirection.Reflect(Vector2D.Left);
+            }
         }
     }
 }
