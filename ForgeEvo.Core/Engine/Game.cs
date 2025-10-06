@@ -43,6 +43,9 @@ public abstract class Game
     ///     Create a new game and register its corresponding events. Provides core functionality to manage the game loop,
     ///     rendering, and updating logic.
     /// </summary>
+    /// <param name="width">Width of the game display in pixels.</param>
+    /// <param name="height">Height of the game display pixels.</param>
+    /// <param name="title">Title of the game display.</param>
     protected Game(uint width = 800, uint height = 600, string title = "Forge Evo")
     {
         Display = new(width, height, title);
