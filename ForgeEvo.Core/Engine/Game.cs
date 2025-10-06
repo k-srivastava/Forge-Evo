@@ -1,4 +1,5 @@
-﻿using Veldrid;
+﻿using System.Diagnostics;
+using Veldrid;
 
 namespace ForgeEvo.Core.Engine;
 
@@ -23,6 +24,11 @@ public abstract class Game
     private readonly Event _gameUpdatedEvent;
 
     /// <summary>
+    ///     Stopwatch used to measure the delta time between frames in seconds.
+    /// </summary>
+    private readonly Stopwatch _stopwatch;
+
+    /// <summary>
     ///     Display used by the game for rendering and managing the window. Provides functionality to create and configure a
     ///     game window, handle window events, and render graphics to the screen.
     /// </summary>
@@ -42,6 +48,8 @@ public abstract class Game
         Display = new(width, height, title);
         Display.Window.Closed += () => _running = false;
 
+        _stopwatch = Stopwatch.StartNew();
+
         EventBus.RegisterInternalEvents(
             InternalEvent.GameInitialized,
             InternalEvent.GameUpdated,
@@ -58,6 +66,8 @@ public abstract class Game
     /// </summary>
     public void Run()
     {
+        double previousElapsed = _stopwatch.Elapsed.TotalSeconds;
+
         Initialize();
         _gameInitializedEvent.Post();
 
@@ -65,10 +75,15 @@ public abstract class Game
         {
             while (_running)
             {
+                double newElapsed = _stopwatch.Elapsed.TotalSeconds;
+                var deltaTime = (float)(newElapsed - previousElapsed);
+
+                previousElapsed = newElapsed;
+
                 InputSnapshot input = Display.Window.PumpEvents();
                 InputHandler.Update(input);
 
-                Update();
+                Update(deltaTime);
                 _gameUpdatedEvent.Post();
 
                 Render();
@@ -90,7 +105,8 @@ public abstract class Game
     /// <summary>
     ///     Update method for the game.
     /// </summary>
-    protected abstract void Update();
+    /// <param name="deltaTime">Time between two consecutive frames in seconds.</param>
+    protected abstract void Update(float deltaTime);
 
     /// <summary>
     ///     Render method for the game.

@@ -16,7 +16,7 @@ internal class ColorGame() : Game(title: "Color & Mouse Demo")
     {
     }
 
-    protected override void Update()
+    protected override void Update(float deltaTime)
     {
         if (InputHandler.IsKeyPressed(Key.Escape))
         {

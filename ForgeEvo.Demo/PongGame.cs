@@ -10,12 +10,12 @@ public class PongGame() : Game(title: "Pong Demo")
 
     private Image _ballImage;
     private MutableVector2D _ballDirection;
-    private readonly float _ballSpeed = 0.3F;
+    private readonly float _ballSpeed = 300;
 
     private Image _playerPaddleImage1;
     private Image _playerPaddleImage2;
 
-    private readonly float _paddleSpeed = 0.4F;
+    private readonly float _paddleSpeed = 400;
 
     protected override void Initialize()
     {
@@ -41,7 +41,7 @@ public class PongGame() : Game(title: "Pong Demo")
         );
     }
 
-    protected override void Update()
+    protected override void Update(float deltaTime)
     {
         if (InputHandler.IsKeyPressed(Key.Escape))
         {
@@ -49,9 +49,9 @@ public class PongGame() : Game(title: "Pong Demo")
             Environment.Exit(0);
         }
 
-        _ballImage.Position += _ballDirection * _ballSpeed;
+        _ballImage.Position += _ballDirection * _ballSpeed * deltaTime;
 
-        ResolvePaddleMovement();
+        ResolvePaddleMovement(deltaTime);
 
         ResolvePaddleBounds();
         ResolveBallBounds();
@@ -68,19 +68,19 @@ public class PongGame() : Game(title: "Pong Demo")
         Display.Render(_backgroundColor);
     }
 
-    private void ResolvePaddleMovement()
+    private void ResolvePaddleMovement(float deltaTime)
     {
         if (InputHandler.IsKeyDown(Key.W))
-            _playerPaddleImage1.Position += Vector2D.Up * _paddleSpeed;
+            _playerPaddleImage1.Position += Vector2D.Up * _paddleSpeed * deltaTime;
 
         if (InputHandler.IsKeyDown(Key.S))
-            _playerPaddleImage1.Position += Vector2D.Down * _paddleSpeed;
+            _playerPaddleImage1.Position += Vector2D.Down * _paddleSpeed * deltaTime;
 
         if (InputHandler.IsKeyDown(Key.Up))
-            _playerPaddleImage2.Position += Vector2D.Up * _paddleSpeed;
+            _playerPaddleImage2.Position += Vector2D.Up * _paddleSpeed * deltaTime;
 
         if (InputHandler.IsKeyDown(Key.Down))
-            _playerPaddleImage2.Position += Vector2D.Down * _paddleSpeed;
+            _playerPaddleImage2.Position += Vector2D.Down * _paddleSpeed * deltaTime;
     }
 
     private void ResolvePaddleBounds()
