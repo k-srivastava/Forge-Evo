@@ -30,11 +30,6 @@ public struct Image : IDisposable
     public MutableVector2D Scale;
 
     /// <summary>
-    ///     Display associated with the sprite of the iamge for quick reference.
-    /// </summary>
-    private readonly Display _display;
-
-    /// <summary>
     ///     Create a new image using an exisitng sprite referenced by its ID in the <see cref="SpriteRegistry" />.
     /// </summary>
     /// <param name="spriteId">ID of the sprite used by the image.</param>
@@ -49,8 +44,6 @@ public struct Image : IDisposable
 
         Sprite? rawSprite = SpriteRegistry.GetById(spriteId);
         Sprite = rawSprite ?? throw new ArgumentException($"Invalid sprite ID {spriteId}.");
-
-        _display = Sprite.Display;
     }
 
     /// <summary>
@@ -65,7 +58,6 @@ public struct Image : IDisposable
         Position = position;
         Scale = scale;
         Sprite = sprite;
-        _display = Sprite.Display;
     }
 
     /// <summary>
@@ -89,7 +81,7 @@ public struct Image : IDisposable
     /// </summary>
     public void Render()
     {
-        _display.AddToRenderList(this);
+        Display.Instance.SpriteRenderer.AddToDrawList(this);
     }
 
     public override string ToString() => $"Image(Sprite: {Sprite}, Position: {Position}, Scale: {Scale})";

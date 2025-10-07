@@ -24,12 +24,12 @@ public class PongGame() : Game(title: "Pong Demo")
 
         _ballDirection = new Vector2D(0.5F, 0.5F).Normal();
 
-        _ballImage = new(new Sprite(Display, ballSourcePath), Vector2D.Zero, Vector2D.One);
+        _ballImage = new(new Sprite(ballSourcePath), Vector2D.Zero, Vector2D.One);
         _ballImage.Position = new(
             Display.Size.Width / 2F - _ballImage.Size.Width, Display.Size.Height / 2F - _ballImage.Size.Height
         );
 
-        Sprite paddleSprite = new(Display, paddleSourcePath);
+        Sprite paddleSprite = new(paddleSourcePath);
 
         _playerPaddleImage1 = new(paddleSprite, Vector2D.Zero, new(0.5F, 2F));
         _playerPaddleImage1.Position = new(20F, (Display.Size.Height - _playerPaddleImage1.Size.Height) / 2F);

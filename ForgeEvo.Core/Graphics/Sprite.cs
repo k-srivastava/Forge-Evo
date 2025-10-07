@@ -19,11 +19,6 @@ public class Sprite : IDisposable
     private readonly Texture _texture;
 
     /// <summary>
-    ///     Display to which the sprite is bound.
-    /// </summary>
-    internal readonly Display Display;
-
-    /// <summary>
     ///     Unique ID of the sprite.
     /// </summary>
     public readonly int Id;
@@ -46,25 +41,24 @@ public class Sprite : IDisposable
     /// <summary>
     ///     Create a new sprite and register it with the <see cref="SpriteRegistry" />.
     /// </summary>
-    /// <param name="display">Display to which the sprite is bound.</param>
     /// <param name="sourcePath">Source path of the image to load into the sprite.</param>
     /// <exception cref="FileNotFoundException">The <c>sourcePath</c> must lead to a valid exisiting file.</exception>
-    public Sprite(Display display, string sourcePath)
+    public Sprite(string sourcePath)
     {
         if (!File.Exists(sourcePath))
             throw new FileNotFoundException("Sprite file not found.", sourcePath);
 
         ImageResult result = ImageResult.FromStream(File.OpenRead(sourcePath), ColorComponents.RedGreenBlueAlpha);
-
         Size = new((uint)result.Width, (uint)result.Height);
-        Display = display;
 
-        _texture = display.Device.ResourceFactory.CreateTexture(TextureDescription.Texture2D(
+        GraphicsDevice device = Display.Instance.Device;
+        _texture = device.ResourceFactory.CreateTexture(TextureDescription.Texture2D(
             Size.Width, Size.Height, 1, 1, PixelFormat.R8_G8_B8_A8_UNorm, TextureUsage.Sampled
         ));
-        TextureView = display.Device.ResourceFactory.CreateTextureView(_texture);
 
-        display.Device.UpdateTexture(_texture, result.Data, 0, 0, 0, Size.Width, Size.Height, 1, 0, 0);
+        TextureView = device.ResourceFactory.CreateTextureView(_texture);
+
+        device.UpdateTexture(_texture, result.Data, 0, 0, 0, Size.Width, Size.Height, 1, 0, 0);
 
         Id = SpriteRegistry.NextId();
         SpriteRegistry.Register(this);

@@ -22,9 +22,9 @@ public class Display : IDisposable
     internal readonly GraphicsDevice Device;
 
     /// <summary>
-    ///     Enumeration of renderers used to by the display.
+    ///     Sprite renderer used by the display.
     /// </summary>
-    private readonly IEnumerable<IRenderer> _renderers;
+    public readonly SpriteRenderer SpriteRenderer;
 
     /// <summary>
     ///     Create a new display using the SLD2 window.
@@ -34,6 +34,9 @@ public class Display : IDisposable
     /// <param name="title">Title of the display.</param>
     internal Display(uint width = 800, uint height = 600, string title = "Forge Evo")
     {
+        if (Instance != null)
+            throw new InvalidOperationException("Cannot create mutiple displays. One display already exists.");
+
         VeldridStartup.CreateWindowAndGraphicsDevice(
             new(50, 50, (int)width, (int)height, WindowState.Normal, title),
             new(),
@@ -45,7 +48,8 @@ public class Display : IDisposable
         Device = device;
 
         _commandList = device.ResourceFactory.CreateCommandList();
-        _renderers = [SpriteRenderer.CreateDefault(device)];
+
+        SpriteRenderer = SpriteRenderer.CreateDefault(device);
 
         Window.Resized += () =>
         {
@@ -55,7 +59,14 @@ public class Display : IDisposable
             )
                 Device.ResizeMainWindow((uint)Window.Width, (uint)Window.Height);
         };
+
+        Instance = this;
     }
+
+    /// <summary>
+    ///     Singleton display instance.
+    /// </summary>
+    public static Display Instance { get; private set; } = null!;
 
     /// <summary>
     ///     Raw SDL2 window for the display.
@@ -71,8 +82,7 @@ public class Display : IDisposable
 
     public void Dispose()
     {
-        foreach (IRenderer renderer in _renderers)
-            renderer.Dispose();
+        SpriteRenderer.Dispose();
 
         _commandList.Dispose();
         Device.Dispose();
@@ -80,6 +90,9 @@ public class Display : IDisposable
         SpriteRegistry.CleanUp();
 
         GC.SuppressFinalize(this);
+
+        if (ReferenceEquals(Instance, this))
+            Instance = null!;
     }
 
     #endregion
@@ -95,21 +108,11 @@ public class Display : IDisposable
         _commandList.SetFramebuffer(Device.MainSwapchain.Framebuffer);
         _commandList.ClearColorTarget(0, color.ToRgbaFloat());
 
-        foreach (IRenderer renderer in _renderers)
-            renderer.Render(_commandList, Size);
+        SpriteRenderer.Render(_commandList, Size);
 
         _commandList.End();
 
         Device.SubmitCommands(_commandList);
         Device.SwapBuffers(Device.MainSwapchain);
-    }
-
-    internal void AddToRenderList(Image image)
-    {
-        foreach (IRenderer renderer in _renderers)
-        {
-            if (renderer is SpriteRenderer spriteRenderer)
-                spriteRenderer.AddToDrawList(image);
-        }
     }
 }

@@ -17,7 +17,7 @@ internal class SpriteGame() : Game(title: "Image Demo")
     {
         var spriteSourcePath = "Assets/Images/flower.png";
 
-        Sprite flowerSprite = new(Display, spriteSourcePath);
+        Sprite flowerSprite = new(spriteSourcePath);
         _flowerImage = new(flowerSprite, Vector2D.Zero, new(0.2F, 0.2F));
         _staticImage = new(flowerSprite, new(100, 100), new(0.2F, 0.2F));
     }
