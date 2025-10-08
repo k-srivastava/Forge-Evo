@@ -98,13 +98,6 @@ public abstract class RendererBase<TDrawItem>(
     #endregion
 
     /// <summary>
-    ///     Create a default renderer instance.
-    /// </summary>
-    /// <param name="device">Graphics device to attach the renderer to.</param>
-    /// <returns></returns>
-    public abstract RendererBase<TDrawItem> CreateDefault(GraphicsDevice device);
-
-    /// <summary>
     ///     Add a draw item to the renderer's draw list.
     /// </summary>
     /// <param name="item">Item to add to the draw list.</param>
@@ -159,7 +152,7 @@ public sealed class SpriteRenderer(
     /// </summary>
     /// <param name="device">Graphics device to attach the renderer to.</param>
     /// <returns>New instance of a sprite renderer.</returns>
-    public override SpriteRenderer CreateDefault(GraphicsDevice device)
+    public static SpriteRenderer CreateDefault(GraphicsDevice device)
     {
         Vertex[] vertices =
         [
