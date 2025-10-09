@@ -194,8 +194,13 @@ public sealed class SpriteRenderer(
             new ResourceLayoutElementDescription("current_sampler_state", ResourceKind.Sampler, ShaderStages.Fragment)
         ));
 
-        Shader vertexShader = LoadShader(device, "Graphics/Shaders/sprite.vert.hlsl", ShaderStages.Vertex);
-        Shader fragmentShader = LoadShader(device, "Graphics/Shaders/sprite.frag.hlsl", ShaderStages.Fragment);
+        Shader vertexShader = LoadShader(
+            device, "Graphics/Shaders/image.vert.hlsl", ShaderStages.Vertex
+        );
+
+        Shader fragmentShader = LoadShader(
+            device, "Graphics/Shaders/image.frag.hlsl", ShaderStages.Fragment
+        );
 
         var pipelineDescription = new GraphicsPipelineDescription
         {
