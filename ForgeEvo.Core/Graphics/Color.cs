@@ -1,4 +1,5 @@
-﻿using System.Runtime.CompilerServices;
+﻿using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.Intrinsics;
 using System.Runtime.Intrinsics.Arm;
@@ -94,6 +95,21 @@ public readonly struct Color : IEquatable<Color>
     /// </summary>
     public static readonly Color Black = new(0, 0, 0);
 
+    /// <summary>
+    ///     Default pure red color with all its red channel set to 255.
+    /// </summary>
+    public static readonly Color PureRed = new(255, 0, 0);
+
+    /// <summary>
+    ///     Default pure green color with all its green channel set to 255.
+    /// </summary>
+    public static readonly Color PureGreen = new(0, 255, 0);
+
+    /// <summary>
+    ///     Default pure blue color with all its blue channel set to 255.
+    /// </summary>
+    public static readonly Color PureBlue = new(0, 0, 255);
+
     #endregion
 
     #region Operators
@@ -166,6 +182,19 @@ public readonly struct Color : IEquatable<Color>
     #endregion
 
     #region Methods
+
+    /// <summary>
+    ///     Generate the same color with the given alpha value.
+    /// </summary>
+    /// <param name="alpha">Value of the alpha channel for the new color.</param>
+    /// <returns>New color with the same red, green, and blue channels but new alpha channel.</returns>
+    public Color WithAlpha(byte alpha) => new(Red, Green, Blue, alpha);
+
+    /// <summary>
+    ///     Convert the color to a <see cref="Vector4" />.
+    /// </summary>
+    /// <returns><see cref="Vector4" /> with channel values.</returns>
+    internal Vector4 ToVector4() => new(Red / 255F, Green / 255F, Blue / 255F, Alpha / 255F);
 
     /// <summary>
     ///     Convert the color to a Veldrid <see cref="RgbaFloat" />.
