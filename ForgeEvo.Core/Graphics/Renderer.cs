@@ -174,6 +174,16 @@ public sealed class ImageRenderer(
     /// </summary>
     private readonly Queue<Image> _renderQueue = new();
 
+    /// <summary>
+    ///     Cache of resource sets for each texture view.
+    /// </summary>
+    private readonly ResourceSetCache _resourceSetCache = new(device, sampler, resourceLayout, transformBuffer);
+
+    /// <summary>
+    ///     Transform matrices for each texture view.
+    /// </summary>
+    private readonly Matrix4x4[] _transformMatrices = new Matrix4x4[MaxRenderQueueSize];
+
     #region IRenderer<Image,ImageRenderer> Members
 
     public static uint MaxRenderQueueSize => 128;
@@ -205,7 +215,7 @@ public sealed class ImageRenderer(
         device.UpdateBuffer(indexBuffer, 0, indices);
 
         DeviceBuffer transformBuffer = device.ResourceFactory.CreateBuffer(new(
-            sizeof(float) * 4 * 4,
+            sizeof(float) * 4 * 4 * MaxRenderQueueSize,
             BufferUsage.UniformBuffer | BufferUsage.Dynamic
         ));
 
@@ -265,27 +275,36 @@ public sealed class ImageRenderer(
         commandList.SetVertexBuffer(0, vertexBuffer);
         commandList.SetIndexBuffer(indexBuffer, IndexFormat.UInt16);
 
-        while (_renderQueue.Count > 0)
+        List<IGrouping<TextureView, Image>> imagesByTexture =
+            _renderQueue.GroupBy(image => image.Sprite.TextureView).ToList();
+
+        foreach (IGrouping<TextureView, Image> group in imagesByTexture)
         {
-            Image image = _renderQueue.Dequeue();
-            Size2D size = image.Size;
-
-            // Compute the scale of the image taking inversions along both axes into account.
-            Vector2D scale = new(
-                size.Width * (image.Scale.X < 0 ? -1 : 1),
-                size.Height * (image.Scale.Y < 0 ? -1 : 1)
-            );
-
-            Matrix4x4 transformMatrix = CreateImageTransform(image.Position, scale, display);
-            commandList.UpdateBuffer(transformBuffer, 0, ref transformMatrix);
-
-            using ResourceSet resourceSet = device.ResourceFactory.CreateResourceSet(new(
-                resourceLayout, transformBuffer, image.Sprite.TextureView, sampler
-            ));
+            TextureView textureView = group.Key;
+            ResourceSet resourceSet = _resourceSetCache.GetOrCreate(textureView);
 
             commandList.SetGraphicsResourceSet(0, resourceSet);
-            commandList.DrawIndexed(6, 1, 0, 0, 0);
+
+            var transformIndex = 0;
+            foreach (Image image in group)
+            {
+                Size2D size = image.Size;
+
+                // Compute the scale of the image taking inversions along both axes into account.
+                Vector2D scale = new(
+                    size.Width * (image.Scale.X < 0 ? -1 : 1),
+                    size.Height * (image.Scale.Y < 0 ? -1 : 1)
+                );
+
+                _transformMatrices[transformIndex++] = CreateImageTransform(image.Position, scale, display);
+            }
+
+            commandList.UpdateBuffer(transformBuffer, 0, _transformMatrices);
+            commandList.DrawIndexed(6, (uint)transformIndex, 0, 0, 0);
         }
+
+        _renderQueue.Clear();
+        _resourceSetCache.CleanUp();
     }
 
     public void Enqueue(Image item)
@@ -300,6 +319,7 @@ public sealed class ImageRenderer(
     {
         pipeline.Dispose();
         resourceLayout.Dispose();
+        _resourceSetCache.Dispose();
         sampler.Dispose();
         vertexBuffer.Dispose();
         indexBuffer.Dispose();
@@ -363,5 +383,92 @@ file static class RendererUtils
 
         string shaderSource = File.ReadAllText(sourcePath);
         return device.ResourceFactory.CreateShader(new(stage, Encoding.UTF8.GetBytes(shaderSource), entryPoint));
+    }
+}
+
+/// <summary>
+///     Cache for <see cref="ResourceSet" />s mapped to <see cref="TextureView" />s.
+/// </summary>
+/// <param name="device">Graphics device of the renderer.</param>
+/// <param name="sampler">Texture sampler of the renderer.</param>
+/// <param name="resourceLayout">Resource layout of the renderer's pipeline.</param>
+/// <param name="transformBuffer">Transform buffer for the texture view.</param>
+internal sealed class ResourceSetCache(
+    GraphicsDevice device,
+    Sampler sampler,
+    ResourceLayout resourceLayout,
+    DeviceBuffer transformBuffer
+) : IDisposable
+{
+    /// <summary>
+    ///     Mapping of texture views to resource sets and when they were last used.
+    /// </summary>
+    private readonly Dictionary<TextureView, (ResourceSet ResourceSet, int LastUsedFrame)> _cache = [];
+
+    /// <summary>
+    ///     Current game frame.
+    /// </summary>
+    private int _currentFrame;
+
+    #region IDisposable Members
+
+    public void Dispose()
+    {
+        foreach ((ResourceSet ResourceSet, int) cached in _cache.Values)
+            cached.ResourceSet.Dispose();
+        _cache.Clear();
+    }
+
+    #endregion
+
+    /// <summary>
+    ///     Try to retrieve the resource set for a given texture view from the cache. If the cache misses, it is created and
+    ///     cached.
+    /// </summary>
+    /// <param name="textureView">Texture view whose given resource set it to be retrieved.</param>
+    /// <returns>Resource set corresponding to the given texture view.</returns>
+    public ResourceSet GetOrCreate(TextureView textureView)
+    {
+        _currentFrame++;
+
+        if (_cache.TryGetValue(textureView, out (ResourceSet ResourceSet, int) cached))
+        {
+            _cache[textureView] = (cached.ResourceSet, _currentFrame);
+            return cached.ResourceSet;
+        }
+
+        ResourceSet resourceSet = device.ResourceFactory.CreateResourceSet(new(
+            resourceLayout,
+            transformBuffer,
+            textureView,
+            sampler
+        ));
+
+        _cache[textureView] = (resourceSet, _currentFrame);
+        return resourceSet;
+    }
+
+    /// <summary>
+    ///     Clean up recently unused resource sets from the cache.
+    /// </summary>
+    /// <param name="framesUnseenThreshold">Number of frames before the cache entry is evicted.</param>
+    /// <remarks>
+    ///     Recently unused resource sets are those that have not been queried for in the last
+    ///     <c>framesUnseenThreshold</c> frames.
+    /// </remarks>
+    public void CleanUp(int framesUnseenThreshold = 300)
+    {
+        List<TextureView> keysToRemove = [];
+        keysToRemove.AddRange(
+            from kvp in _cache
+            where _currentFrame - kvp.Value.LastUsedFrame > framesUnseenThreshold
+            select kvp.Key
+        );
+
+        foreach (TextureView key in keysToRemove)
+        {
+            _cache[key].ResourceSet.Dispose();
+            _cache.Remove(key);
+        }
     }
 }
