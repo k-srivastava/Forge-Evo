@@ -38,8 +38,8 @@ internal class SpriteGame() : Game(title: "Image Demo")
 
     protected override void Render()
     {
-        _flowerImage.Render();
-        _staticImage.Render();
+        _flowerImage.Enqueue();
+        _staticImage.Enqueue();
 
         Display.Render(_background);
     }

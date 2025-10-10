@@ -22,9 +22,9 @@ public class Display : IDisposable
     internal readonly GraphicsDevice Device;
 
     /// <summary>
-    ///     Sprite renderer used by the display.
+    /// Master renderer used by the display.
     /// </summary>
-    public readonly SpriteRenderer SpriteRenderer;
+    public readonly MasterRenderer Renderer;
 
     /// <summary>
     ///     Create a new display using the SLD2 window.
@@ -35,7 +35,7 @@ public class Display : IDisposable
     internal Display(uint width = 800, uint height = 600, string title = "Forge Evo")
     {
         if (Instance != null)
-            throw new InvalidOperationException("Cannot create mutiple displays. One display already exists.");
+            throw new InvalidOperationException("Cannot create multiple displays. One display already exists.");
 
         VeldridStartup.CreateWindowAndGraphicsDevice(
             new(50, 50, (int)width, (int)height, WindowState.Normal, title),
@@ -49,7 +49,7 @@ public class Display : IDisposable
 
         _commandList = device.ResourceFactory.CreateCommandList();
 
-        SpriteRenderer = SpriteRenderer.CreateDefault(device);
+        Renderer = MasterRenderer.CreateDefault(device);
 
         Window.Resized += () =>
         {
@@ -82,7 +82,8 @@ public class Display : IDisposable
 
     public void Dispose()
     {
-        SpriteRenderer.Dispose();
+        // Renderer.Dispose();
+        Renderer.Dispose();
 
         _commandList.Dispose();
         Device.Dispose();
@@ -108,7 +109,7 @@ public class Display : IDisposable
         _commandList.SetFramebuffer(Device.MainSwapchain.Framebuffer);
         _commandList.ClearColorTarget(0, color.ToRgbaFloat());
 
-        SpriteRenderer.Render(_commandList, Size);
+        Renderer.Render(_commandList, Size);
 
         _commandList.End();
 

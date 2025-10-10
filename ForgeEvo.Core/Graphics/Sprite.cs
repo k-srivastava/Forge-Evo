@@ -8,8 +8,8 @@ using Veldrid;
 namespace ForgeEvo.Core.Graphics;
 
 /// <summary>
-///     Represents a 2D sprite that can be rendered to a <see cref="Engine.Display" /> via its
-///     <see cref="SpriteRenderer" />.
+///     Represents a 2D sprite that can be rendered to a <see cref="Display" /> via its
+///     <see cref="ImageRenderer" />.
 /// </summary>
 public class Sprite : IDisposable
 {

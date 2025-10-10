@@ -5,9 +5,9 @@ namespace ForgeEvo.Core.Graphics;
 
 /// <summary>
 ///     Represents a <see cref="Sprite" /> that can be rendered to a <see cref="Display" /> via its
-///     <see cref="SpriteRenderer" /> along with position and scale.
+///     <see cref="ImageRenderer" /> along with position and scale.
 /// </summary>
-public struct Image : IDisposable
+public struct Image : IRenderable, IDisposable
 {
     /// <summary>
     ///     Internal sprite of the image.
@@ -76,12 +76,10 @@ public struct Image : IDisposable
 
     #endregion
 
-    /// <summary>
-    ///     Render the image's sprite at its current position and scale.
-    /// </summary>
-    public void Render()
+    public void Enqueue()
     {
-        Display.Instance.SpriteRenderer.AddToDrawList(this);
+        if (!Display.Instance.Renderer.TryEnqueue(this))
+            throw new InvalidOperationException("Master renderer does not have a sprite renderer.");
     }
 
     public override string ToString() => $"Image(Sprite: {Sprite}, Position: {Position}, Scale: {Scale})";

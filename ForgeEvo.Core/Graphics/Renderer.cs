@@ -2,9 +2,21 @@
 using System.Runtime.CompilerServices;
 using System.Text;
 using ForgeEvo.Core.Math;
+using JetBrains.Annotations;
 using Veldrid;
 
 namespace ForgeEvo.Core.Graphics;
+
+/// <summary>
+///     Generic interface for a renderable item.
+/// </summary>
+public interface IRenderable
+{
+    /// <summary>
+    ///     Enqueue the item to its corresponding renderer's render queue.
+    /// </summary>
+    void Enqueue();
+}
 
 /// <summary>
 ///     Generic interface for a Forge renderer.
@@ -12,132 +24,142 @@ namespace ForgeEvo.Core.Graphics;
 public interface IRenderer : IDisposable
 {
     /// <summary>
-    ///     Render the contents of the command list to its display of given size.
+    ///     Render the contents of the render queue to its display of a given size.
     /// </summary>
-    /// <param name="commandList">Command list to be followed during the render.</param>
-    /// <param name="displaySize">Size of the display.</param>
-    void Render(CommandList commandList, Size2D displaySize);
+    /// <param name="commandList">List of commands to be followed during the render.</param>
+    /// <param name="display">Size of the display.</param>
+    void Render(CommandList commandList, Size2D display);
+
+    /// <summary>
+    ///     Create a default renderer of the given type.
+    /// </summary>
+    /// <param name="device">Graphics device of the renderer's parent.</param>
+    /// <typeparam name="TRenderer">Renderer type to instantiate.</typeparam>
+    /// <typeparam name="TItem">Renderer's corresponding render item type.</typeparam>
+    /// <returns>Default instance of the specified renderer.</returns>
+    static TRenderer CreateDefault<TRenderer, TItem>(GraphicsDevice device)
+        where TRenderer : IRenderer<TItem, TRenderer> where TItem : IRenderable => TRenderer.CreateDefault(device);
 }
 
 /// <summary>
-///     Base class for a Forge renderer with <see cref="Veldrid" /> interop.
+///     Generic interface for a Forge renderer with its given render item type.
 /// </summary>
-/// <param name="device">Graphics device of the renderer's parent.</param>
-/// <param name="pipeline">Render pipeline to be followed.</param>
-/// <param name="resourceLayout">Resouce layout of the pipeline.</param>
-/// <param name="sampler">Texture sampler of the renderer.</param>
-/// <param name="vertexBuffer">Vertex object buffer to hold vertex positions.</param>
-/// <param name="indexBuffer">Index object buffer to hold vertex order.</param>
-/// <param name="transformBuffer">Transform buffer to hold transform data.</param>
-/// <typeparam name="TDrawItem">Datatype to be rendered by this renderer.</typeparam>
-public abstract class RendererBase<TDrawItem>(
-    GraphicsDevice device,
-    Pipeline pipeline,
-    ResourceLayout resourceLayout,
-    Sampler sampler,
-    DeviceBuffer vertexBuffer,
-    DeviceBuffer indexBuffer,
-    DeviceBuffer transformBuffer
-) : IRenderer where TDrawItem : struct
+/// <typeparam name="TRenderItem">Type of the item the renderer renders.</typeparam>
+/// <typeparam name="TSelf">Type of the renderer itself.</typeparam>
+/// <remarks>
+///     The interface requires <c>TSelf</c> for reflection to enforce <c>CreateDefault</c> as an interface method at
+///     compile-time.
+/// </remarks>
+public interface IRenderer<in TRenderItem, out TSelf> : IRenderer
+    where TRenderItem : IRenderable
+    where TSelf : IRenderer<TRenderItem, TSelf>
 {
     /// <summary>
-    ///     Graphics device of the renderer's parent.
+    ///     Maximum queue size of the renderer.
     /// </summary>
-    protected readonly GraphicsDevice Device = device;
+    static abstract uint MaxRenderQueueSize { get; }
 
     /// <summary>
-    ///     List of draw items to be rendererd.
+    ///     Create a default instance of the renderer.
     /// </summary>
-    protected readonly List<TDrawItem> DrawList = new(128);
+    /// <param name="device">Graphics device of the renderer's parent.</param>
+    /// <returns>Default instance of the renderer.</returns>
+    static abstract TSelf CreateDefault(GraphicsDevice device);
 
     /// <summary>
-    ///     Index buffer object to hold vertex order.
+    ///     Enqueue a render item to the renderer's render queue.
     /// </summary>
-    protected readonly DeviceBuffer IndexBuffer = indexBuffer;
+    /// <param name="item">Item to render.</param>
+    void Enqueue(TRenderItem item);
+}
+
+/// <summary>
+///     Master renderer containing all the active renderers for the game.
+/// </summary>
+public sealed class MasterRenderer : IRenderer
+{
+    /// <summary>
+    ///     Image renderer.
+    /// </summary>
+    private readonly ImageRenderer? _imageRenderer;
 
     /// <summary>
-    ///     Render pipeline to be followed.
+    ///     List of all the renderers.
     /// </summary>
-    protected readonly Pipeline Pipeline = pipeline;
+    private readonly IRenderer[] _renderers;
 
     /// <summary>
-    ///     Resource layout of the pipeline.s
+    ///     Create a new primary renderer with the given renderers.
     /// </summary>
-    protected readonly ResourceLayout ResourceLayout = resourceLayout;
+    /// <param name="renderers">List of all child renderers.</param>
+    public MasterRenderer(params IRenderer[] renderers)
+    {
+        _renderers = renderers;
 
-    /// <summary>
-    ///     Texture sampler.
-    /// </summary>
-    protected readonly Sampler Sampler = sampler;
-
-    /// <summary>
-    ///     Transform buffer object to hold transform data.
-    /// </summary>
-    protected readonly DeviceBuffer TransformBuffer = transformBuffer;
-
-    /// <summary>
-    ///     Vertex buffer object to hold vertex positions.
-    /// </summary>
-    protected readonly DeviceBuffer VertexBuffer = vertexBuffer;
+        foreach (IRenderer renderer in renderers)
+        {
+            switch (renderer)
+            {
+                case ImageRenderer imageRenderer:
+                    _imageRenderer = imageRenderer;
+                    break;
+            }
+        }
+    }
 
     #region IRenderer Members
 
-    public abstract void Render(CommandList commandList, Size2D displaySize);
-
-    public virtual void Dispose()
+    public void Render(CommandList commandList, Size2D display)
     {
-        VertexBuffer.Dispose();
-        IndexBuffer.Dispose();
-        TransformBuffer.Dispose();
+        foreach (IRenderer renderer in _renderers)
+            renderer.Render(commandList, display);
+    }
 
-        Pipeline.Dispose();
-        ResourceLayout.Dispose();
-        Sampler.Dispose();
+    public void Dispose()
+    {
+        foreach (IRenderer renderer in _renderers)
+            renderer.Dispose();
     }
 
     #endregion
 
     /// <summary>
-    ///     Add a draw item to the renderer's draw list.
+    ///     Create a default primary renderer with default instances of every renderer.
     /// </summary>
-    /// <param name="item">Item to add to the draw list.</param>
-    public void AddToDrawList(TDrawItem item)
-    {
-        DrawList.Add(item);
-    }
+    /// <param name="device">Graphics device of the renderer's parent.</param>
+    /// <returns>New master renderer.</returns>
+    public static MasterRenderer CreateDefault(GraphicsDevice device) => new(ImageRenderer.CreateDefault(device));
 
     /// <summary>
-    ///     Load an HLSL shader from a file.
+    ///     Attempt to enqueue a renderable item to the renderer's render queue by dispatching it to the relevant child
+    ///     renderer if it exists.
     /// </summary>
-    /// <param name="device">Graphics device to load the shader into.</param>
-    /// <param name="sourcePath">Source path of the shader to load.</param>
-    /// <param name="stage">Stage of the shader: vertex, fragment, compute, etc.</param>
-    /// <param name="entryPoint">Execution entry point of the shader, usually the main function.</param>
-    /// <returns>Loaded shader attached to the <c>device</c>.</returns>
-    /// <exception cref="FileNotFoundException">The <c>sourcePath</c> must lead to a valid exisiting file.</exception>
-    protected static Shader LoadShader(
-        GraphicsDevice device, string sourcePath, ShaderStages stage, string entryPoint = "main"
-    )
+    /// <param name="renderable">Render item to enqueue.</param>
+    /// <returns><c>true</c> if the item could be added to the relevant renderer, otherwise <c>false</c>.</returns>
+    public bool TryEnqueue(IRenderable renderable)
     {
-        if (!File.Exists(sourcePath))
-            throw new FileNotFoundException("Shader file not found.", sourcePath);
+        switch (renderable)
+        {
+            case Image image:
+                _imageRenderer?.Enqueue(image);
+                return true;
+        }
 
-        string shaderSource = File.ReadAllText(sourcePath);
-        return device.ResourceFactory.CreateShader(new(stage, Encoding.UTF8.GetBytes(shaderSource), entryPoint));
+        return false;
     }
 }
 
 /// <summary>
-///     Sprite renderer that renders raw <see cref="Sprite" />s from <see cref="Image" />s.
+///     Image renderer that renders raw <see cref="Sprite" />s from <see cref="Image" />s.
 /// </summary>
 /// <param name="device">Graphics device of the renderer's parent.</param>
 /// <param name="pipeline">Render pipeline to be followed.</param>
-/// <param name="resourceLayout">Resouce layout of the pipeline.</param>
+/// <param name="resourceLayout">Resource layout of the <c>pipeline</c>.</param>
 /// <param name="sampler">Texture sampler of the renderer.</param>
 /// <param name="vertexBuffer">Vertex object buffer to hold vertex positions.</param>
 /// <param name="indexBuffer">Index object buffer to hold vertex order.</param>
-/// <param name="transformBuffer">Transform buffer to hold transform data.</param>
-public sealed class SpriteRenderer(
+/// <param name="transformBuffer">Transform object buffer to hold transform data.</param>
+public sealed class ImageRenderer(
     GraphicsDevice device,
     Pipeline pipeline,
     ResourceLayout resourceLayout,
@@ -145,14 +167,18 @@ public sealed class SpriteRenderer(
     DeviceBuffer vertexBuffer,
     DeviceBuffer indexBuffer,
     DeviceBuffer transformBuffer
-) : RendererBase<Image>(device, pipeline, resourceLayout, sampler, vertexBuffer, indexBuffer, transformBuffer)
+) : IRenderer<Image, ImageRenderer>
 {
     /// <summary>
-    ///     Create a default 2D sprite renderer attached to the given <c>device</c>.
+    ///     Queue of images to be rendered.
     /// </summary>
-    /// <param name="device">Graphics device to attach the renderer to.</param>
-    /// <returns>New instance of a sprite renderer.</returns>
-    public static SpriteRenderer CreateDefault(GraphicsDevice device)
+    private readonly Queue<Image> _renderQueue = new();
+
+    #region IRenderer<Image,ImageRenderer> Members
+
+    public static uint MaxRenderQueueSize => 128;
+
+    public static ImageRenderer CreateDefault(GraphicsDevice device)
     {
         Vertex[] vertices =
         [
@@ -194,11 +220,11 @@ public sealed class SpriteRenderer(
             new ResourceLayoutElementDescription("current_sampler_state", ResourceKind.Sampler, ShaderStages.Fragment)
         ));
 
-        Shader vertexShader = LoadShader(
+        Shader vertexShader = RendererUtils.LoadShader(
             device, "Graphics/Shaders/image.vert.hlsl", ShaderStages.Vertex
         );
 
-        Shader fragmentShader = LoadShader(
+        Shader fragmentShader = RendererUtils.LoadShader(
             device, "Graphics/Shaders/image.frag.hlsl", ShaderStages.Fragment
         );
 
@@ -230,22 +256,18 @@ public sealed class SpriteRenderer(
         return new(device, pipeline, resourceLayout, sampler, vertexBuffer, indexBuffer, transformBuffer);
     }
 
-    /// <summary>
-    ///     Render all the sprites in the draw list.
-    /// </summary>
-    /// <param name="commandList">Command list to follow during rendering.</param>
-    /// <param name="displaySize">Size of the display to which all the sprites are to be rendered.</param>
-    public override void Render(CommandList commandList, Size2D displaySize)
+    public void Render(CommandList commandList, Size2D display)
     {
-        if (DrawList.Count == 0)
+        if (_renderQueue.Count == 0)
             return;
 
-        commandList.SetPipeline(Pipeline);
-        commandList.SetVertexBuffer(0, VertexBuffer);
-        commandList.SetIndexBuffer(IndexBuffer, IndexFormat.UInt16);
+        commandList.SetPipeline(pipeline);
+        commandList.SetVertexBuffer(0, vertexBuffer);
+        commandList.SetIndexBuffer(indexBuffer, IndexFormat.UInt16);
 
-        foreach (Image image in DrawList)
+        while (_renderQueue.Count > 0)
         {
+            Image image = _renderQueue.Dequeue();
             Size2D size = image.Size;
 
             // Compute the scale of the image taking inversions along both axes into account.
@@ -254,40 +276,53 @@ public sealed class SpriteRenderer(
                 size.Height * (image.Scale.Y < 0 ? -1 : 1)
             );
 
-            Matrix4x4 transformMatrix = CreateSpriteTransform(
-                image.Position,
-                scale,
-                displaySize
-            );
+            Matrix4x4 transformMatrix = CreateImageTransform(image.Position, scale, display);
+            commandList.UpdateBuffer(transformBuffer, 0, ref transformMatrix);
 
-            commandList.UpdateBuffer(TransformBuffer, 0, ref transformMatrix);
-
-            using ResourceSet resourceSet = Device.ResourceFactory.CreateResourceSet(new(
-                ResourceLayout, TransformBuffer, image.Sprite.TextureView, Sampler
+            using ResourceSet resourceSet = device.ResourceFactory.CreateResourceSet(new(
+                resourceLayout, transformBuffer, image.Sprite.TextureView, sampler
             ));
 
             commandList.SetGraphicsResourceSet(0, resourceSet);
             commandList.DrawIndexed(6, 1, 0, 0, 0);
         }
-
-        DrawList.Clear();
     }
 
+    public void Enqueue(Image item)
+    {
+        if (_renderQueue.Count >= MaxRenderQueueSize)
+            throw new InvalidOperationException("Image render queue is full.");
+
+        _renderQueue.Enqueue(item);
+    }
+
+    public void Dispose()
+    {
+        pipeline.Dispose();
+        resourceLayout.Dispose();
+        sampler.Dispose();
+        vertexBuffer.Dispose();
+        indexBuffer.Dispose();
+        transformBuffer.Dispose();
+    }
+
+    #endregion
+
     /// <summary>
-    ///     Calculate the transform matrix for a given sprite.
+    ///     Calculate the transform matrix for a given <see cref="Sprite" />.
     /// </summary>
     /// <param name="position">Position of the sprite on the display.</param>
     /// <param name="scale">Scale of the sprite.</param>
-    /// <param name="displaySize">Size of the display to which the sprite is rendered.</param>
+    /// <param name="display">Size of the display to which the sprite is rendered.</param>
     /// <returns>Transform matrix of the sprite used in the fragment shader.</returns>
-    private static Matrix4x4 CreateSpriteTransform(Vector2D position, Vector2D scale, Size2D displaySize)
+    private static Matrix4x4 CreateImageTransform(Vector2D position, Vector2D scale, Size2D display)
     {
         Vector2D translation = new(
-            position.X / displaySize.Width * 2 - 1 + scale.X / displaySize.Width,
-            1 - position.Y / displaySize.Height * 2 - scale.Y / displaySize.Height
+            position.X / display.Width * 2 - 1 + scale.X / display.Width,
+            1 - position.Y / display.Height * 2 - scale.Y / display.Height
         );
 
-        var scaleMatrix = Matrix4x4.CreateScale(scale.X / displaySize.Width, scale.Y / displaySize.Height, 1);
+        var scaleMatrix = Matrix4x4.CreateScale(scale.X / display.Width, scale.Y / display.Height, 1);
         var translationMatrix = Matrix4x4.CreateTranslation(translation.X, translation.Y, 0);
 
         return scaleMatrix * translationMatrix;
@@ -295,9 +330,38 @@ public sealed class SpriteRenderer(
 
     #region Nested type: Vertex
 
-    // ReSharper disable NotAccessedPositionalProperty.Local
-    private readonly record struct Vertex(Vector2D Position, Vector2D TextureCoordinate);
-    // ReSharper restore NotAccessedPositionalProperty.Local
+    /// <summary>
+    ///     Vertex of each <see cref="Image" /> rendered to the display.
+    /// </summary>
+    /// <param name="Position">Position of the vertex.</param>
+    /// <param name="TextureCoordinate">UV texture coordinate of the vertex.</param>
+    private readonly record struct Vertex([UsedImplicitly] Vector2D Position, Vector2D TextureCoordinate);
 
     #endregion
+}
+
+/// <summary>
+///     Collection of utility functions for rendering.
+/// </summary>
+file static class RendererUtils
+{
+    /// <summary>
+    ///     Load an HLSL shader from a file.
+    /// </summary>
+    /// <param name="device">Graphics device to load the shader into.</param>
+    /// <param name="sourcePath">Source path of the shader to load.</param>
+    /// <param name="stage">Stage of the shader: vertex, fragment, compute, etc.</param>
+    /// <param name="entryPoint">Execution entry point of the shader, usually the <c>main</c> function.</param>
+    /// <returns>Loaded shader attached to the <c>device</c>.</returns>
+    /// <exception cref="FileNotFoundException">The <c>sourcePath</c> must lead to a valid existing file.</exception>
+    internal static Shader LoadShader(
+        GraphicsDevice device, string sourcePath, ShaderStages stage, string entryPoint = "main"
+    )
+    {
+        if (!File.Exists(sourcePath))
+            throw new FileNotFoundException("Shader file not found.", sourcePath);
+
+        string shaderSource = File.ReadAllText(sourcePath);
+        return device.ResourceFactory.CreateShader(new(stage, Encoding.UTF8.GetBytes(shaderSource), entryPoint));
+    }
 }

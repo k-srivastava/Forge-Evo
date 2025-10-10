@@ -61,9 +61,9 @@ public class PongGame() : Game(title: "Pong Demo")
 
     protected override void Render()
     {
-        _ballImage.Render();
-        _playerPaddleImage1.Render();
-        _playerPaddleImage2.Render();
+        _ballImage.Enqueue();
+        _playerPaddleImage1.Enqueue();
+        _playerPaddleImage2.Enqueue();
 
         Display.Render(_backgroundColor);
     }
