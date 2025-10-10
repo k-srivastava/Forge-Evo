@@ -1,4 +1,5 @@
-﻿using ForgeEvo.Demo;
+﻿using ForgeEvo.Core.Engine;
+using ForgeEvo.Demo;
 
-var demo = new PongGame();
+Game demo = new StressTestGame();
 demo.Run();

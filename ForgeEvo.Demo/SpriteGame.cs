@@ -7,8 +7,8 @@ namespace ForgeEvo.Demo;
 internal class SpriteGame() : Game(title: "Image Demo")
 {
     private readonly Color _background = new(100, 149, 237);
-    private readonly float _movementSpeed = 200F;
-    private readonly float _scaleSpeed = 2F;
+    private const float MovementSpeed = 200F;
+    private const float ScaleSpeed = 2F;
 
     private Image _flowerImage;
     private Image _staticImage;
@@ -47,22 +47,22 @@ internal class SpriteGame() : Game(title: "Image Demo")
     private void ResolveMovement(float deltaTime)
     {
         if (InputHandler.IsKeyDown(Key.W))
-            _flowerImage.Position += Vector2D.Up * _movementSpeed * deltaTime;
+            _flowerImage.Position += Vector2D.Up * MovementSpeed * deltaTime;
 
         if (InputHandler.IsKeyDown(Key.S))
-            _flowerImage.Position += Vector2D.Down * _movementSpeed * deltaTime;
+            _flowerImage.Position += Vector2D.Down * MovementSpeed * deltaTime;
 
         if (InputHandler.IsKeyDown(Key.A))
-            _flowerImage.Position += Vector2D.Left * _movementSpeed * deltaTime;
+            _flowerImage.Position += Vector2D.Left * MovementSpeed * deltaTime;
 
         if (InputHandler.IsKeyDown(Key.D))
-            _flowerImage.Position += Vector2D.Right * _movementSpeed * deltaTime;
+            _flowerImage.Position += Vector2D.Right * MovementSpeed * deltaTime;
 
         if (InputHandler.IsKeyDown(Key.Up))
-            _flowerImage.Scale += Vector2D.One * _scaleSpeed * deltaTime;
+            _flowerImage.Scale += Vector2D.One * ScaleSpeed * deltaTime;
 
         if (InputHandler.IsKeyDown(Key.Down))
-            _flowerImage.Scale -= Vector2D.One * _scaleSpeed * deltaTime;
+            _flowerImage.Scale -= Vector2D.One * ScaleSpeed * deltaTime;
     }
 
     private void ResolveImageBounds()

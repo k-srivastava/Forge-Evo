@@ -79,6 +79,11 @@ public interface IRenderer<in TRenderItem, out TSelf> : IRenderer
 public sealed class MasterRenderer : IRenderer
 {
     /// <summary>
+    ///     Circle renderer.
+    /// </summary>
+    private readonly CircleRenderer? _circleRenderer;
+
+    /// <summary>
     ///     Image renderer.
     /// </summary>
     private readonly ImageRenderer? _imageRenderer;
@@ -102,6 +107,10 @@ public sealed class MasterRenderer : IRenderer
             {
                 case ImageRenderer imageRenderer:
                     _imageRenderer = imageRenderer;
+                    break;
+
+                case CircleRenderer circleRenderer:
+                    _circleRenderer = circleRenderer;
                     break;
             }
         }
@@ -128,7 +137,10 @@ public sealed class MasterRenderer : IRenderer
     /// </summary>
     /// <param name="device">Graphics device of the renderer's parent.</param>
     /// <returns>New master renderer.</returns>
-    public static MasterRenderer CreateDefault(GraphicsDevice device) => new(ImageRenderer.CreateDefault(device));
+    public static MasterRenderer CreateDefault(GraphicsDevice device) => new(
+        ImageRenderer.CreateDefault(device),
+        CircleRenderer.CreateDefault(device)
+    );
 
     /// <summary>
     ///     Attempt to enqueue a renderable item to the renderer's render queue by dispatching it to the relevant child
@@ -142,6 +154,10 @@ public sealed class MasterRenderer : IRenderer
         {
             case Image image:
                 _imageRenderer?.Enqueue(image);
+                return true;
+
+            case Circle circle:
+                _circleRenderer?.Enqueue(circle);
                 return true;
         }
 
@@ -356,6 +372,205 @@ public sealed class ImageRenderer(
     /// <param name="Position">Position of the vertex.</param>
     /// <param name="TextureCoordinate">UV texture coordinate of the vertex.</param>
     private readonly record struct Vertex([UsedImplicitly] Vector2D Position, Vector2D TextureCoordinate);
+
+    #endregion
+}
+
+/// <summary>
+///     Circle renderer that renders <see cref="Circle" />s.
+/// </summary>
+/// <param name="device">Graphics device of the renderer's parent.</param>
+/// <param name="pipeline">Render pipeline to be followed.</param>
+/// <param name="resourceLayout">Resource layout of the <c>pipeline</c>.</param>
+/// <param name="transformBuffer">Transform object buffer to hold transform data.</param>
+public sealed class CircleRenderer(
+    GraphicsDevice device,
+    Pipeline pipeline,
+    ResourceLayout resourceLayout,
+    DeviceBuffer transformBuffer
+) : IRenderer<Circle, CircleRenderer>
+{
+    /// <summary>
+    ///     Index object buffer to hold vertex order, updated every render cycle.
+    /// </summary>
+    private readonly DeviceBuffer _dynamicIndexBuffer = device.ResourceFactory.CreateBuffer(new(
+        sizeof(ushort) * MaxIndices,
+        BufferUsage.IndexBuffer | BufferUsage.Dynamic
+    ));
+
+    /// <summary>
+    ///     Vertex object buffer to hold vertex positions, updated every render cycle.
+    /// </summary>
+    private readonly DeviceBuffer _dynamicVertexBuffer = device.ResourceFactory.CreateBuffer(new(
+        sizeof(float) * (2 + 4) * MaxVertices,
+        BufferUsage.VertexBuffer | BufferUsage.Dynamic
+    ));
+
+    /// <summary>
+    ///     Vertex orders of all the circles to be rendered.
+    /// </summary>
+    private readonly ushort[] _indices = new ushort[MaxIndices];
+
+    /// <summary>
+    ///     Queue of circles to be rendered.
+    /// </summary>
+    private readonly Queue<Circle> _renderQueue = new();
+
+    /// <summary>
+    ///     Vertices of all the circles to be rendered.
+    /// </summary>
+    private readonly Vertex[] _vertices = new Vertex[MaxVertices];
+
+    /// <summary>
+    ///     Maximum vertices that can be rendered at once.
+    /// </summary>
+    private static uint MaxVertices => MaxRenderQueueSize * (Circle.MaxSegments + 2);
+
+    /// <summary>
+    ///     Maximum indices corresponding to the vertices that can be rendered at once.
+    /// </summary>
+    private static uint MaxIndices => MaxRenderQueueSize * Circle.MaxSegments * 3;
+
+    #region IRenderer<Circle,CircleRenderer> Members
+
+    public static uint MaxRenderQueueSize => 128;
+
+    public static CircleRenderer CreateDefault(GraphicsDevice device)
+    {
+        DeviceBuffer transformBuffer = device.ResourceFactory.CreateBuffer(new(
+            sizeof(float) * 4 * 4, BufferUsage.UniformBuffer | BufferUsage.Dynamic
+        ));
+
+        ResourceLayout resourceLayout = device.ResourceFactory.CreateResourceLayout(new(
+            new ResourceLayoutElementDescription("transform", ResourceKind.UniformBuffer, ShaderStages.Vertex)
+        ));
+
+        Shader vertexShader =
+            RendererUtils.LoadShader(device, "Graphics/Shaders/circle.vert.hlsl", ShaderStages.Vertex);
+        Shader fragmentShader =
+            RendererUtils.LoadShader(device, "Graphics/Shaders/circle.frag.hlsl", ShaderStages.Fragment);
+
+        var pipelineDescription = new GraphicsPipelineDescription
+        {
+            BlendState = BlendStateDescription.SingleAlphaBlend,
+            DepthStencilState = DepthStencilStateDescription.Disabled,
+            RasterizerState = RasterizerStateDescription.CullNone,
+            PrimitiveTopology = PrimitiveTopology.TriangleList,
+            ResourceLayouts = [resourceLayout],
+            ShaderSet = new(
+                [
+                    new(
+                        new VertexElementDescription(
+                            "position", VertexElementSemantic.Position, VertexElementFormat.Float2
+                        ),
+                        new VertexElementDescription(
+                            "color", VertexElementSemantic.Color, VertexElementFormat.Float4
+                        )
+                    )
+                ],
+                [vertexShader, fragmentShader]
+            ),
+            Outputs = device.MainSwapchain.Framebuffer.OutputDescription
+        };
+
+        Pipeline pipeline = device.ResourceFactory.CreateGraphicsPipeline(pipelineDescription);
+
+        return new(device, pipeline, resourceLayout, transformBuffer);
+    }
+
+    public void Render(CommandList commandList, Size2D display)
+    {
+        if (_renderQueue.Count == 0)
+            return;
+
+        commandList.SetPipeline(pipeline);
+
+        var vertexCount = 0;
+        var indexCount = 0;
+        ushort vertexOffset = 0;
+
+        while (_renderQueue.Count > 0)
+        {
+            Circle circle = _renderQueue.Dequeue();
+
+            var color = circle.Color.ToVector4();
+            _vertices[vertexCount++] = new(circle.Center, color);
+
+            for (uint i = 0; i <= circle.Segments; i++)
+            {
+                float angle = 2 * MathF.PI * i / circle.Segments;
+                _vertices[vertexCount++] = new(
+                    new(
+                        circle.Center.X + MathF.Cos(angle) * circle.Radius,
+                        circle.Center.Y + MathF.Sin(angle) * circle.Radius
+                    ),
+                    color
+                );
+            }
+
+            for (ushort i = 1; i <= circle.Segments; i++)
+            {
+                _indices[indexCount++] = vertexOffset;
+                _indices[indexCount++] = (ushort)(vertexOffset + i);
+                _indices[indexCount++] = (ushort)(vertexOffset + i + 1);
+            }
+
+            vertexOffset += (ushort)(circle.Segments + 2);
+        }
+
+        commandList.UpdateBuffer(_dynamicVertexBuffer, 0, _vertices);
+        commandList.UpdateBuffer(_dynamicIndexBuffer, 0, _indices);
+
+        Matrix4x4 screenToNdc = CreateCircleTransform(display);
+        commandList.UpdateBuffer(transformBuffer, 0, ref screenToNdc);
+
+        commandList.SetVertexBuffer(0, _dynamicVertexBuffer);
+        commandList.SetIndexBuffer(_dynamicIndexBuffer, IndexFormat.UInt16);
+
+        using ResourceSet resourceSet = device.ResourceFactory.CreateResourceSet(new(
+            resourceLayout, transformBuffer
+        ));
+
+        commandList.SetGraphicsResourceSet(0, resourceSet);
+        commandList.DrawIndexed((uint)indexCount, 1, 0, 0, 0);
+    }
+
+    public void Enqueue(Circle item)
+    {
+        if (_renderQueue.Count >= MaxRenderQueueSize)
+            throw new InvalidOperationException("Circle render queue is full.");
+
+        _renderQueue.Enqueue(item);
+    }
+
+    public void Dispose()
+    {
+        pipeline.Dispose();
+        resourceLayout.Dispose();
+        _dynamicVertexBuffer.Dispose();
+        _dynamicIndexBuffer.Dispose();
+        transformBuffer.Dispose();
+    }
+
+    #endregion
+
+    /// <summary>
+    ///     Calculate the transform matrix for a given <see cref="Circle" />.
+    /// </summary>
+    /// <param name="display">Size of the display to which the circle is rendered.</param>
+    /// <returns>Transform matrix of the curl used in the fragment shader.</returns>
+    private static Matrix4x4 CreateCircleTransform(Size2D display) =>
+        Matrix4x4.CreateScale(2F / display.Width, -2F / display.Height, 1)
+        * Matrix4x4.CreateTranslation(-1, 1, 0);
+
+    #region Nested type: Vertex
+
+    /// <summary>
+    ///     Vertex of each <see cref="Circle" /> rendered to the display.
+    /// </summary>
+    /// <param name="Position">Position of the vertex.</param>
+    /// <param name="Color">Color of the vertex.</param>
+    private readonly record struct Vertex([UsedImplicitly] Vector2 Position, Vector4 Color);
 
     #endregion
 }
